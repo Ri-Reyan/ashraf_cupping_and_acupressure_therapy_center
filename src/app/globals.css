@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 216 33% 98%; /* #F8FBFA */
+    --secondary-bg: 168 33% 93%; /* #E8F2EF */
+
+    --foreground: 168 46% 17%; /* #173F3A (Main text) */
+    --secondary-text: 174 90% 22%; /* #066B62 (Secondary text / Accent) */
+
+    --card: 0 0% 100%;
+    --card-foreground: 168 46% 17%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 168 46% 17%;
+
+    --primary: 174 90% 22%; /* #066B62 */
+    --primary-foreground: 0 0% 100%;
+
+    --muted: 168 33% 93%; /* #E8F2EF */
+    --muted-foreground: 168 25% 40%;
+
+    --accent: 168 33% 93%;
+    --accent-foreground: 168 46% 17%;
+
+    --border: 168 20% 85%;
+    --input: 168 20% 85%;
+    --ring: 174 90% 22%;
+
+    --radius: 0.5rem;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f8fbfa;
+  color: #173f3a;
+  font-family: var(--font-noto-serif), serif;
+}
+
+/* Jodi kothao sans-serif ba Hind font dorkar hoy */
+.font-sans-bn {
+  font-family: var(--font-hind), sans-serif;
 }
