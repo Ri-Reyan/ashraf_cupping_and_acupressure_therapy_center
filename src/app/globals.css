@@ -1,43 +1,57 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 216 33% 98%; /* #F8FBFA */
-    --secondary-bg: 168 33% 93%; /* #E8F2EF */
+@custom-variant dark (&:is(.dark *));
 
-    --foreground: 168 46% 17%; /* #173F3A (Main text) */
-    --secondary-text: 174 90% 22%; /* #066B62 (Secondary text / Accent) */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --font-sans: var(--font-hind-siliguri), sans-serif;
+  --font-serif: var(--font-noto-serif-bengali), serif;
+}
 
-    --card: 0 0% 100%;
-    --card-foreground: 168 46% 17%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 168 46% 17%;
-
-    --primary: 174 90% 22%; /* #066B62 */
-    --primary-foreground: 0 0% 100%;
-
-    --muted: 168 33% 93%; /* #E8F2EF */
-    --muted-foreground: 168 25% 40%;
-
-    --accent: 168 33% 93%;
-    --accent-foreground: 168 46% 17%;
-
-    --border: 168 20% 85%;
-    --input: 168 20% 85%;
-    --ring: 174 90% 22%;
-
-    --radius: 0.5rem;
-  }
+:root {
+  color-scheme: light;
+  --background: #f8fbfa;
+  --foreground: #183330;
+  --card: #ffffff;
+  --card-foreground: #183330;
+  --primary: #087c71;
+  --primary-foreground: #ffffff;
+  --secondary: #e6f2ef;
+  --secondary-foreground: #17645d;
+  --muted: #edf4f2;
+  --muted-foreground: #69807c;
+  --accent: #e4f0ed;
+  --accent-foreground: #087c71;
+  --destructive: #bd4b4b;
+  --border: #d9e7e3;
+  --input: #d9e7e3;
+  --ring: #087c71;
+  --radius: 0.85rem;
 }
 
 body {
-  background-color: #f8fbfa;
-  color: #173f3a;
-  font-family: var(--font-noto-serif), serif;
-}
-
-/* Jodi kothao sans-serif ba Hind font dorkar hoy */
-.font-sans-bn {
-  font-family: var(--font-hind), sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-serif);
 }

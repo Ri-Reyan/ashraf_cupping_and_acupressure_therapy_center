@@ -1,18 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Hind_Siliguri, Noto_Serif_Bengali } from "next/font/google";
+import { Hind_Siliguri, Noto_Serif_Bengali, Geist } from "next/font/google";
 import "./globals.css";
+import { LandingProvider } from "@/context/LandingContext";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
 
 // ফন্ট কনফিগারেশন
 const hindSiliguri = Hind_Siliguri({
   subsets: ["bengali"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-hind",
+  variable: "--font-hind-siliguri",
 });
 
 const notoSerif = Noto_Serif_Bengali({
   subsets: ["bengali"],
   weight: ["400", "600", "700"],
-  variable: "--font-noto-serif",
+  variable: "--font-noto-serif-bengali",
 });
 
 export const metadata: Metadata = {
@@ -35,10 +40,10 @@ export default function RootLayout({
   return (
     <html
       lang="bn"
-      className={`${hindSiliguri.variable} ${notoSerif.variable}`}
+      className={cn(hindSiliguri.variable, notoSerif.variable, "font-sans", geist.variable)}
     >
-      <body className="font-sans antialiased bg-[#F8FBFA] text-[#173F3A]">
-        {children}
+      <body className="font-serif antialiased bg-[#F8FBFA] text-[#173F3A]">
+        <LandingProvider>{children}</LandingProvider>
       </body>
     </html>
   );
