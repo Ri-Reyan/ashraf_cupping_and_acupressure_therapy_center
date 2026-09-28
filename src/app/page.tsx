@@ -1,4 +1,5 @@
 import HeroSection from "@/landing_page_components/HeroSection";
+import HowItWorks from "@/landing_page_components/HowItWorks";
 import Menubar from "@/landing_page_components/Menubar";
 import Navbar from "@/landing_page_components/Navbar";
 import ProblemStatement from "@/landing_page_components/ProblemStatement";
@@ -14,6 +15,7 @@ const LandingPage = () => {
       <SocialProof />
       <ProblemStatement />
       <SolutionSection />
+      <HowItWorks />
     </main>
   );
 };
