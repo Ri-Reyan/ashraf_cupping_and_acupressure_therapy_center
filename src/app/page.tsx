@@ -1,3 +1,4 @@
+import Footer from "@/landing_page_components/Footer";
 import HeroSection from "@/landing_page_components/HeroSection";
 import HowItWorks from "@/landing_page_components/HowItWorks";
 import Menubar from "@/landing_page_components/Menubar";
@@ -16,6 +17,7 @@ const LandingPage = () => {
       <ProblemStatement />
       <SolutionSection />
       <HowItWorks />
+      <Footer />
     </main>
   );
 };
