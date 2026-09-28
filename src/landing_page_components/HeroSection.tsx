@@ -44,10 +44,7 @@ const HeroSection = () => {
           </p>
         </div>
         <Button className="flex bg-[#1C9A6F] w-full mx-6 py-6 place-self-center font-bold">
-          <a
-            href="https://wa.me/8801700000000"
-            className="button button-whatsapp button-large"
-          >
+          <a href="https://wa.me/8801700000000">
             <div className="flex flex-row gap-x-1">
               <MessageCircle size={30} />
               <span className="font-sans">WhatsApp-এ পরামর্শ নিন</span>
