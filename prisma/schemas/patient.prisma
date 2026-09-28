@@ -1,0 +1,10 @@
+model Patient {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String   @db.Text
+  mobile    BigInt
+  role      String   @db.Text
+  
+  books     Book[]
+
+  @@map("patient")
+}

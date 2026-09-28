@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Clock, Heart } from "lucide-react";
+import { MapPin, Phone, Clock, Heart } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -28,7 +28,7 @@ export default function Footer() {
           <ul className="space-y-2 font-serif text-sm text-gray-300">
             <li>
               <a
-                href="#services"
+                href="/services"
                 className="hover:text-primary transition-colors"
               >
                 আমাদের সেবাসমূহ
@@ -36,23 +36,15 @@ export default function Footer() {
             </li>
             <li>
               <a
-                href="#how-it-works"
+                href="/therapists"
                 className="hover:text-primary transition-colors"
               >
-                চিকিৎসা পদ্ধতি
+                থেরাপিস্টদের সম্পর্কে
               </a>
             </li>
             <li>
               <a
-                href="#testimonials"
-                className="hover:text-primary transition-colors"
-              >
-                রোগীদের মতামত
-              </a>
-            </li>
-            <li>
-              <a
-                href="#contact"
+                href="https://wa.me/8801700000000"
                 className="hover:text-primary transition-colors"
               >
                 অ্যাপয়েন্টমেন্ট বুকিং
@@ -71,25 +63,22 @@ export default function Footer() {
             {/* লোকেশন */}
             <div className="flex items-start gap-3">
               <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-              <span>পিরোজালী, ঢাকা বিভাগ, বাংলাদেশ</span>
+              <span>
+                রুম নং-০২, শহীদপার্ক জামে মসজিদ টাউনহল মোহাম্মদপুর, ঢাকা ১২১২,
+                বাংলাদেশ
+              </span>
             </div>
 
             {/* ফোন নম্বর */}
             <div className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-primary shrink-0" />
-              <span dir="ltr">+৮৮০ ১৭০০-০০০০০০</span>
-            </div>
-
-            {/* ইমেইল */}
-            <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-primary shrink-0" />
-              <span>info@ashraftherapy.com</span>
+              <span dir="ltr">+৮৮০ ০১৭১৬-৩১৭৯৮৬</span>
             </div>
 
             {/* সময়সূচী */}
             <div className="flex items-start gap-3 pt-1">
               <Clock className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-              <span>শনি থেকে বৃহস্পতি: সকাল ১০টা - রাত ৮টা</span>
+              <span>শনি–বৃহস্পতি · সকাল ১০ টা–রাত ১০ টা</span>
             </div>
           </div>
         </div>

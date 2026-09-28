@@ -1,0 +1,24 @@
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Therapist {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String    @db.Text
+  email     String    @unique @db.Text
+  mobile    Int
+  location  String?   @db.Text
+  education String?   @db.Text
+  age       Int
+  gender    Gender
+  salary    Int
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt DateTime  @updatedAt @db.Timestamp(6)
+
+  books     Book[]
+  advances  Advance[]
+
+  @@map("therapist")
+}

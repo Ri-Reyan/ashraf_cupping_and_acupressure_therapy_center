@@ -1,0 +1,25 @@
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIAL
+}
+
+model Book {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  patientId     String        @db.Uuid
+  service       String[]      @db.Text
+  isSession     Boolean
+  session_count Int?
+  current_count Int
+  serial        Int
+  therapistId   String?       @db.Uuid
+  paymentStatus PaymentStatus
+  fee           Int?
+  createdAt     DateTime      @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime      @updatedAt @db.Timestamp(6)
+
+  patient   Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  therapist Therapist? @relation(fields: [therapistId], references: [id], onDelete: SetNull)
+
+  @@map("book")
+}

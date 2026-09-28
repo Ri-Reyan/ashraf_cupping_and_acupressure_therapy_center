@@ -1,0 +1,11 @@
+model Advance {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  therapistId String   @db.Uuid
+  amount      Int
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @updatedAt @db.Timestamp(6)
+
+  therapist Therapist @relation(fields: [therapistId], references: [id], onDelete: Cascade)
+
+  @@map("advance")
+}
