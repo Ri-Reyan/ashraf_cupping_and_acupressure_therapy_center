@@ -4,6 +4,22 @@
   "target": "postgres",
   "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
   "roots": {
+    "Appointment": {
+      "model": "Appointment",
+      "namespace": "public"
+    },
+    "Expense": {
+      "model": "Expense",
+      "namespace": "public"
+    },
+    "Service": {
+      "model": "Service",
+      "namespace": "public"
+    },
+    "TherapistPayout": {
+      "model": "TherapistPayout",
+      "namespace": "public"
+    },
     "User": {
       "model": "User",
       "namespace": "public"
@@ -12,20 +28,8 @@
       "model": "Advance",
       "namespace": "public"
     },
-    "book": {
-      "model": "Book",
-      "namespace": "public"
-    },
-    "expenses": {
-      "model": "Expenses",
-      "namespace": "public"
-    },
     "patient": {
       "model": "Patient",
-      "namespace": "public"
-    },
-    "services": {
-      "model": "Services",
       "namespace": "public"
     },
     "therapist": {
@@ -121,7 +125,7 @@
               "table": "advance"
             }
           },
-          "Book": {
+          "Appointment": {
             "fields": {
               "createdAt": {
                 "nullable": false,
@@ -129,19 +133,36 @@
                   "codecId": "pg/timestamp-temporal@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 }
               },
-              "current_count": {
+              "createdById": {
                 "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "currentCount": {
+                "nullable": true,
                 "type": {
                   "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
-              "fee": {
+              "deletedAt": {
                 "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "fee": {
+                "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
                   "kind": "scalar"
@@ -151,6 +172,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "invoiceNo": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
@@ -168,16 +196,6 @@
                   "kind": "scalar"
                 }
               },
-              "paymentStatus": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/enum@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "typeName": "PaymentStatus"
-                  }
-                }
-              },
               "serial": {
                 "nullable": false,
                 "type": {
@@ -185,7 +203,14 @@
                   "kind": "scalar"
                 }
               },
-              "service": {
+              "serialDate": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/date-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "services": {
                 "many": true,
                 "nullable": true,
                 "type": {
@@ -193,17 +218,38 @@
                   "kind": "scalar"
                 }
               },
-              "session_count": {
+              "sessionCount": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
-              "therapistId": {
+              "sessionGroupId": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "therapistId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "therapistPercent": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "therapistShare": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
@@ -213,12 +259,28 @@
                   "codecId": "pg/timestamp-temporal@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 }
               }
             },
             "relations": {
+              "createdBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "createdById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
               "patient": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -237,7 +299,7 @@
               },
               "therapist": {
                 "cardinality": "N:1",
-                "nullable": true,
+                "nullable": false,
                 "on": {
                   "localFields": [
                     "therapistId"
@@ -257,8 +319,14 @@
                 "createdAt": {
                   "column": "createdAt"
                 },
-                "current_count": {
-                  "column": "current_count"
+                "createdById": {
+                  "column": "createdById"
+                },
+                "currentCount": {
+                  "column": "currentCount"
+                },
+                "deletedAt": {
+                  "column": "deletedAt"
                 },
                 "fee": {
                   "column": "fee"
@@ -266,41 +334,53 @@
                 "id": {
                   "column": "id"
                 },
+                "invoiceNo": {
+                  "column": "invoiceNo"
+                },
                 "isSession": {
                   "column": "isSession"
                 },
                 "patientId": {
                   "column": "patientId"
                 },
-                "paymentStatus": {
-                  "column": "paymentStatus"
-                },
                 "serial": {
                   "column": "serial"
                 },
-                "service": {
-                  "column": "service"
+                "serialDate": {
+                  "column": "serialDate"
                 },
-                "session_count": {
-                  "column": "session_count"
+                "services": {
+                  "column": "services"
+                },
+                "sessionCount": {
+                  "column": "sessionCount"
+                },
+                "sessionGroupId": {
+                  "column": "sessionGroupId"
                 },
                 "therapistId": {
                   "column": "therapistId"
+                },
+                "therapistPercent": {
+                  "column": "therapistPercent"
+                },
+                "therapistShare": {
+                  "column": "therapistShare"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
                 }
               },
               "namespaceId": "public",
-              "table": "book"
+              "table": "Appointment"
             }
           },
-          "Expenses": {
+          "Expense": {
             "fields": {
               "amount": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/text@1",
+                  "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
@@ -310,7 +390,24 @@
                   "codecId": "pg/timestamp-temporal@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
+                  }
+                }
+              },
+              "createdById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "expenseDate": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
                   }
                 }
               },
@@ -334,12 +431,29 @@
                   "codecId": "pg/timestamp-temporal@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "createdBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "createdById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
             "storage": {
               "fields": {
                 "amount": {
@@ -347,6 +461,12 @@
                 },
                 "createdAt": {
                   "column": "createdAt"
+                },
+                "createdById": {
+                  "column": "createdById"
+                },
+                "expenseDate": {
+                  "column": "expenseDate"
                 },
                 "id": {
                   "column": "id"
@@ -359,11 +479,38 @@
                 }
               },
               "namespaceId": "public",
-              "table": "expenses"
+              "table": "Expense"
             }
           },
           "Patient": {
             "fields": {
+              "age": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "gender": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/enum@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "typeName": "Gender"
+                  }
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -374,7 +521,7 @@
               "mobile": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/int8@1",
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -385,16 +532,19 @@
                   "kind": "scalar"
                 }
               },
-              "role": {
+              "updatedAt": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
+                  "codecId": "pg/timestamp-temporal@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
                 }
               }
             },
             "relations": {
-              "books": {
+              "appointments": {
                 "cardinality": "1:N",
                 "on": {
                   "localFields": [
@@ -405,13 +555,22 @@
                   ]
                 },
                 "to": {
-                  "model": "Book",
+                  "model": "Appointment",
                   "namespace": "public"
                 }
               }
             },
             "storage": {
               "fields": {
+                "age": {
+                  "column": "age"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "gender": {
+                  "column": "gender"
+                },
                 "id": {
                   "column": "id"
                 },
@@ -421,15 +580,15 @@
                 "name": {
                   "column": "name"
                 },
-                "role": {
-                  "column": "role"
+                "updatedAt": {
+                  "column": "updatedAt"
                 }
               },
               "namespaceId": "public",
               "table": "patient"
             }
           },
-          "Services": {
+          "Service": {
             "fields": {
               "createdAt": {
                 "nullable": false,
@@ -437,7 +596,7 @@
                   "codecId": "pg/timestamp-temporal@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 }
               },
@@ -461,7 +620,7 @@
                   "codecId": "pg/timestamp-temporal@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 }
               }
@@ -483,7 +642,7 @@
                 }
               },
               "namespaceId": "public",
-              "table": "services"
+              "table": "Service"
             }
           },
           "Therapist": {
@@ -501,19 +660,22 @@
                   "codecId": "pg/timestamp-temporal@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
+                  }
+                }
+              },
+              "deletedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
                   }
                 }
               },
               "education": {
                 "nullable": true,
-                "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
-                }
-              },
-              "email": {
-                "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -546,7 +708,7 @@
               "mobile": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/int4@1",
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -557,20 +719,13 @@
                   "kind": "scalar"
                 }
               },
-              "salary": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/int4@1",
-                  "kind": "scalar"
-                }
-              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/timestamp-temporal@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 }
               }
@@ -591,7 +746,7 @@
                   "namespace": "public"
                 }
               },
-              "books": {
+              "appointments": {
                 "cardinality": "1:N",
                 "on": {
                   "localFields": [
@@ -602,7 +757,22 @@
                   ]
                 },
                 "to": {
-                  "model": "Book",
+                  "model": "Appointment",
+                  "namespace": "public"
+                }
+              },
+              "payouts": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "therapistId"
+                  ]
+                },
+                "to": {
+                  "model": "TherapistPayout",
                   "namespace": "public"
                 }
               }
@@ -615,11 +785,11 @@
                 "createdAt": {
                   "column": "createdAt"
                 },
+                "deletedAt": {
+                  "column": "deletedAt"
+                },
                 "education": {
                   "column": "education"
-                },
-                "email": {
-                  "column": "email"
                 },
                 "gender": {
                   "column": "gender"
@@ -636,15 +806,109 @@
                 "name": {
                   "column": "name"
                 },
-                "salary": {
-                  "column": "salary"
-                },
                 "updatedAt": {
                   "column": "updatedAt"
                 }
               },
               "namespaceId": "public",
               "table": "therapist"
+            }
+          },
+          "TherapistPayout": {
+            "fields": {
+              "amount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "paidById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "therapistId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "paidBy": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "paidById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "therapist": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "therapistId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Therapist",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "amount": {
+                  "column": "amount"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "paidById": {
+                  "column": "paidById"
+                },
+                "therapistId": {
+                  "column": "therapistId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "TherapistPayout"
             }
           },
           "User": {
@@ -655,7 +919,17 @@
                   "codecId": "pg/timestamp-temporal@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
+                  }
+                }
+              },
+              "deletedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
                   }
                 }
               },
@@ -676,12 +950,19 @@
               "mobile": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/int4@1",
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
               "name": {
                 "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "passwordHash": {
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -693,7 +974,7 @@
                   "codecId": "pg/enum@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "typeName": "UserRole"
+                    "typeName": "Role"
                   }
                 }
               },
@@ -703,16 +984,65 @@
                   "codecId": "pg/timestamp-temporal@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "appointments": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "createdById"
+                  ]
+                },
+                "to": {
+                  "model": "Appointment",
+                  "namespace": "public"
+                }
+              },
+              "expenses": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "createdById"
+                  ]
+                },
+                "to": {
+                  "model": "Expense",
+                  "namespace": "public"
+                }
+              },
+              "payouts": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "paidById"
+                  ]
+                },
+                "to": {
+                  "model": "TherapistPayout",
+                  "namespace": "public"
+                }
+              }
+            },
             "storage": {
               "fields": {
                 "createdAt": {
                   "column": "createdAt"
+                },
+                "deletedAt": {
+                  "column": "deletedAt"
                 },
                 "email": {
                   "column": "email"
@@ -725,6 +1055,9 @@
                 },
                 "name": {
                   "column": "name"
+                },
+                "passwordHash": {
+                  "column": "passwordHash"
                 },
                 "role": {
                   "column": "role"
@@ -755,25 +1088,480 @@
               ],
               "typeName": "Gender"
             },
-            "PaymentStatus": {
-              "kind": "postgres-enum",
-              "members": [
-                "PENDING",
-                "PAID",
-                "PARTIAL"
-              ],
-              "typeName": "PaymentStatus"
-            },
-            "UserRole": {
+            "Role": {
               "kind": "postgres-enum",
               "members": [
                 "ADMIN",
-                "STAFF"
+                "RECEPTIONIST"
               ],
-              "typeName": "UserRole"
+              "typeName": "Role"
             }
           },
           "table": {
+            "Appointment": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "createdById": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "currentCount": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "deletedAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "nativeType": "timestamp",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "fee": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "invoiceNo": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "isSession": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "patientId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "serial": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "serialDate": {
+                  "codecId": "pg/date-temporal@1",
+                  "nativeType": "date",
+                  "nullable": false
+                },
+                "services": {
+                  "codecId": "pg/text@1",
+                  "many": true,
+                  "nativeType": "text",
+                  "noCheck": [
+                    "elementNotNull"
+                  ],
+                  "nullable": true
+                },
+                "sessionCount": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "sessionGroupId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
+                },
+                "therapistId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "therapistPercent": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "therapistShare": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "patientId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Appointment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "patient"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "therapistId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Appointment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "therapist"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "createdById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Appointment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "createdAt"
+                  ],
+                  "name": "Appointment_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "invoiceNo"
+                  ],
+                  "name": "Appointment_invoiceNo_key",
+                  "unique": true
+                },
+                {
+                  "columns": [
+                    "patientId"
+                  ],
+                  "name": "Appointment_patientId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "serialDate",
+                    "serial"
+                  ],
+                  "name": "Appointment_serialDate_serial_key",
+                  "unique": true
+                },
+                {
+                  "columns": [
+                    "sessionGroupId"
+                  ],
+                  "name": "Appointment_sessionGroupId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "therapistId"
+                  ],
+                  "name": "Appointment_therapistId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "Expense": {
+              "columns": {
+                "amount": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "createdById": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "expenseDate": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "name": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "createdById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Expense"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "expenseDate"
+                  ],
+                  "name": "Expense_expenseDate_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "Service": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "name": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [
+                {
+                  "columns": [
+                    "name"
+                  ],
+                  "name": "Service_name_key",
+                  "unique": true
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "TherapistPayout": {
+              "columns": {
+                "amount": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "paidById": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "therapistId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "therapistId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "TherapistPayout"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "therapist"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "paidById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "TherapistPayout"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "createdAt"
+                  ],
+                  "name": "TherapistPayout_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "therapistId",
+                    "createdAt"
+                  ],
+                  "name": "TherapistPayout_therapistId_createdAt_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "User": {
               "columns": {
                 "createdAt": {
@@ -785,7 +1573,15 @@
                   "nativeType": "timestamp",
                   "nullable": false,
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
+                  }
+                },
+                "deletedAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "nativeType": "timestamp",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 3
                   }
                 },
                 "email": {
@@ -795,16 +1591,12 @@
                 },
                 "id": {
                   "codecId": "pg/uuid@1",
-                  "default": {
-                    "expression": "gen_random_uuid()",
-                    "kind": "function"
-                  },
                   "nativeType": "uuid",
                   "nullable": false
                 },
                 "mobile": {
-                  "codecId": "pg/int4@1",
-                  "nativeType": "int4",
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
                   "nullable": false
                 },
                 "name": {
@@ -812,16 +1604,21 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "passwordHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "role": {
                   "codecId": "pg/enum@1",
-                  "nativeType": "UserRole",
+                  "nativeType": "Role",
                   "nullable": false,
                   "typeParams": {
-                    "typeName": "UserRole"
+                    "typeName": "Role"
                   },
                   "valueSet": {
                     "entityKind": "valueSet",
-                    "entityName": "UserRole",
+                    "entityName": "Role",
                     "namespaceId": "public",
                     "plane": "storage"
                   }
@@ -831,7 +1628,7 @@
                   "nativeType": "timestamp",
                   "nullable": false,
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 }
               },
@@ -843,6 +1640,14 @@
                   ],
                   "name": "User_email_key",
                   "unique": true
+                },
+                {
+                  "columns": [
+                    "role",
+                    "deletedAt"
+                  ],
+                  "name": "User_role_deletedAt_idx",
+                  "unique": false
                 }
               ],
               "primaryKey": {
@@ -922,8 +1727,13 @@
               },
               "uniques": []
             },
-            "book": {
+            "patient": {
               "columns": {
+                "age": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
                 "createdAt": {
                   "codecId": "pg/timestamp-temporal@1",
                   "default": {
@@ -933,239 +1743,31 @@
                   "nativeType": "timestamp",
                   "nullable": false,
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 },
-                "current_count": {
-                  "codecId": "pg/int4@1",
-                  "nativeType": "int4",
-                  "nullable": false
-                },
-                "fee": {
-                  "codecId": "pg/int4@1",
-                  "nativeType": "int4",
-                  "nullable": true
-                },
-                "id": {
-                  "codecId": "pg/uuid@1",
-                  "default": {
-                    "expression": "gen_random_uuid()",
-                    "kind": "function"
-                  },
-                  "nativeType": "uuid",
-                  "nullable": false
-                },
-                "isSession": {
-                  "codecId": "pg/bool@1",
-                  "nativeType": "bool",
-                  "nullable": false
-                },
-                "patientId": {
-                  "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
-                  "nullable": false
-                },
-                "paymentStatus": {
+                "gender": {
                   "codecId": "pg/enum@1",
-                  "nativeType": "PaymentStatus",
+                  "nativeType": "Gender",
                   "nullable": false,
                   "typeParams": {
-                    "typeName": "PaymentStatus"
+                    "typeName": "Gender"
                   },
                   "valueSet": {
                     "entityKind": "valueSet",
-                    "entityName": "PaymentStatus",
+                    "entityName": "Gender",
                     "namespaceId": "public",
                     "plane": "storage"
                   }
                 },
-                "serial": {
-                  "codecId": "pg/int4@1",
-                  "nativeType": "int4",
-                  "nullable": false
-                },
-                "service": {
-                  "codecId": "pg/text@1",
-                  "many": true,
-                  "nativeType": "text",
-                  "noCheck": [
-                    "elementNotNull"
-                  ],
-                  "nullable": true
-                },
-                "session_count": {
-                  "codecId": "pg/int4@1",
-                  "nativeType": "int4",
-                  "nullable": true
-                },
-                "therapistId": {
-                  "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
-                  "nullable": true
-                },
-                "updatedAt": {
-                  "codecId": "pg/timestamp-temporal@1",
-                  "nativeType": "timestamp",
-                  "nullable": false,
-                  "typeParams": {
-                    "precision": 6
-                  }
-                }
-              },
-              "foreignKeys": [
-                {
-                  "onDelete": "cascade",
-                  "onUpdate": "cascade",
-                  "source": {
-                    "columns": [
-                      "patientId"
-                    ],
-                    "namespaceId": "public",
-                    "tableName": "book"
-                  },
-                  "target": {
-                    "columns": [
-                      "id"
-                    ],
-                    "namespaceId": "public",
-                    "tableName": "patient"
-                  }
-                },
-                {
-                  "onDelete": "setNull",
-                  "onUpdate": "cascade",
-                  "source": {
-                    "columns": [
-                      "therapistId"
-                    ],
-                    "namespaceId": "public",
-                    "tableName": "book"
-                  },
-                  "target": {
-                    "columns": [
-                      "id"
-                    ],
-                    "namespaceId": "public",
-                    "tableName": "therapist"
-                  }
-                }
-              ],
-              "indexes": [],
-              "primaryKey": {
-                "columns": [
-                  "id"
-                ]
-              },
-              "uniques": []
-            },
-            "expenses": {
-              "columns": {
-                "amount": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": false
-                },
-                "createdAt": {
-                  "codecId": "pg/timestamp-temporal@1",
-                  "default": {
-                    "expression": "now()",
-                    "kind": "function"
-                  },
-                  "nativeType": "timestamp",
-                  "nullable": false,
-                  "typeParams": {
-                    "precision": 6
-                  }
-                },
                 "id": {
                   "codecId": "pg/uuid@1",
-                  "default": {
-                    "expression": "gen_random_uuid()",
-                    "kind": "function"
-                  },
-                  "nativeType": "uuid",
-                  "nullable": false
-                },
-                "name": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": false
-                },
-                "updatedAt": {
-                  "codecId": "pg/timestamp-temporal@1",
-                  "nativeType": "timestamp",
-                  "nullable": false,
-                  "typeParams": {
-                    "precision": 6
-                  }
-                }
-              },
-              "foreignKeys": [],
-              "indexes": [],
-              "primaryKey": {
-                "columns": [
-                  "id"
-                ]
-              },
-              "uniques": []
-            },
-            "patient": {
-              "columns": {
-                "id": {
-                  "codecId": "pg/uuid@1",
-                  "default": {
-                    "expression": "gen_random_uuid()",
-                    "kind": "function"
-                  },
                   "nativeType": "uuid",
                   "nullable": false
                 },
                 "mobile": {
-                  "codecId": "pg/int8@1",
-                  "nativeType": "int8",
-                  "nullable": false
-                },
-                "name": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
-                  "nullable": false
-                },
-                "role": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": false
-                }
-              },
-              "foreignKeys": [],
-              "indexes": [],
-              "primaryKey": {
-                "columns": [
-                  "id"
-                ]
-              },
-              "uniques": []
-            },
-            "services": {
-              "columns": {
-                "createdAt": {
-                  "codecId": "pg/timestamp-temporal@1",
-                  "default": {
-                    "expression": "now()",
-                    "kind": "function"
-                  },
-                  "nativeType": "timestamp",
-                  "nullable": false,
-                  "typeParams": {
-                    "precision": 6
-                  }
-                },
-                "id": {
-                  "codecId": "pg/uuid@1",
-                  "default": {
-                    "expression": "gen_random_uuid()",
-                    "kind": "function"
-                  },
-                  "nativeType": "uuid",
                   "nullable": false
                 },
                 "name": {
@@ -1178,12 +1780,27 @@
                   "nativeType": "timestamp",
                   "nullable": false,
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 }
               },
               "foreignKeys": [],
-              "indexes": [],
+              "indexes": [
+                {
+                  "columns": [
+                    "mobile"
+                  ],
+                  "name": "patient_mobile_key",
+                  "unique": true
+                },
+                {
+                  "columns": [
+                    "name"
+                  ],
+                  "name": "patient_name_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
@@ -1207,18 +1824,21 @@
                   "nativeType": "timestamp",
                   "nullable": false,
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
+                  }
+                },
+                "deletedAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "nativeType": "timestamp",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 3
                   }
                 },
                 "education": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
-                },
-                "email": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": false
                 },
                 "gender": {
                   "codecId": "pg/enum@1",
@@ -1236,10 +1856,6 @@
                 },
                 "id": {
                   "codecId": "pg/uuid@1",
-                  "default": {
-                    "expression": "gen_random_uuid()",
-                    "kind": "function"
-                  },
                   "nativeType": "uuid",
                   "nullable": false
                 },
@@ -1249,8 +1865,8 @@
                   "nullable": true
                 },
                 "mobile": {
-                  "codecId": "pg/int4@1",
-                  "nativeType": "int4",
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
                   "nullable": false
                 },
                 "name": {
@@ -1258,17 +1874,12 @@
                   "nativeType": "text",
                   "nullable": false
                 },
-                "salary": {
-                  "codecId": "pg/int4@1",
-                  "nativeType": "int4",
-                  "nullable": false
-                },
                 "updatedAt": {
                   "codecId": "pg/timestamp-temporal@1",
                   "nativeType": "timestamp",
                   "nullable": false,
                   "typeParams": {
-                    "precision": 6
+                    "precision": 3
                   }
                 }
               },
@@ -1276,10 +1887,10 @@
               "indexes": [
                 {
                   "columns": [
-                    "email"
+                    "deletedAt"
                   ],
-                  "name": "therapist_email_key",
-                  "unique": true
+                  "name": "therapist_deletedAt_idx",
+                  "unique": false
                 }
               ],
               "primaryKey": {
@@ -1299,19 +1910,11 @@
                 "OTHER"
               ]
             },
-            "PaymentStatus": {
-              "kind": "valueSet",
-              "values": [
-                "PENDING",
-                "PAID",
-                "PARTIAL"
-              ]
-            },
-            "UserRole": {
+            "Role": {
               "kind": "valueSet",
               "values": [
                 "ADMIN",
-                "STAFF"
+                "RECEPTIONIST"
               ]
             }
           }
@@ -1320,12 +1923,101 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "9eba4bf74913dbc3a7a851c9e270c6b8deed55add2ea894602d0e49ae147edfc"
+    "storageHash": "6cd232c25016af38d2a4c836d476d8eeaaaed44b8cc400c9a128a3fdfd1611b2"
   },
   "execution": {
-    "executionHash": "baabf863de7f71c0b02ae9cd15f43d34e8f525637d0328eb3251bcf69fa9f69a",
+    "executionHash": "dff239d33a490bf02c66c6f1ae00d9adf253b48ccb47f472c8ec525952cee876",
     "mutations": {
       "defaults": [
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "Appointment",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "plainDateTimeNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "plainDateTimeNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "Appointment",
+            "field": "updatedAt",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "Expense",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "plainDateTimeNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "plainDateTimeNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "Expense",
+            "field": "updatedAt",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "Service",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "plainDateTimeNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "plainDateTimeNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "Service",
+            "field": "updatedAt",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "TherapistPayout",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
         {
           "onCreate": {
             "id": "plainDateTimeNow",
@@ -1358,16 +2050,12 @@
         },
         {
           "onCreate": {
-            "id": "plainDateTimeNow",
-            "kind": "generator"
-          },
-          "onUpdate": {
-            "id": "plainDateTimeNow",
+            "id": "uuidv4",
             "kind": "generator"
           },
           "ref": {
-            "entry": "book",
-            "field": "updatedAt",
+            "entry": "patient",
+            "field": "id",
             "namespace": "public"
           }
         },
@@ -1381,23 +2069,19 @@
             "kind": "generator"
           },
           "ref": {
-            "entry": "expenses",
+            "entry": "patient",
             "field": "updatedAt",
             "namespace": "public"
           }
         },
         {
           "onCreate": {
-            "id": "plainDateTimeNow",
-            "kind": "generator"
-          },
-          "onUpdate": {
-            "id": "plainDateTimeNow",
+            "id": "uuidv4",
             "kind": "generator"
           },
           "ref": {
-            "entry": "services",
-            "field": "updatedAt",
+            "entry": "therapist",
+            "field": "id",
             "namespace": "public"
           }
         },

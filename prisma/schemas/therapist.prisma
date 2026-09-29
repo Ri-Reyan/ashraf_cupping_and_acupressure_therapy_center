@@ -1,24 +1,18 @@
-enum Gender {
-  MALE
-  FEMALE
-  OTHER
-}
-
 model Therapist {
-  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String    @db.Text
-  email     String    @unique @db.Text
-  mobile    Int
-  location  String?   @db.Text
-  education String?   @db.Text
-  age       Int
-  gender    Gender
-  salary    Int
-  createdAt DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt DateTime  @updatedAt @db.Timestamp(6)
+  id           String            @id @default(uuid()) @db.Uuid
+  name         String
+  mobile       String
+  location     String?
+  education    String?
+  age          Int
+  gender       Gender
+  deletedAt    DateTime?
+  appointments Appointment[]
+  payouts      TherapistPayout[]
+  advances     Advance[]        
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
-  books     Book[]
-  advances  Advance[]
-
+  @@index([deletedAt])
   @@map("therapist")
 }

@@ -1,0 +1,12 @@
+model TherapistPayout {
+  id          String    @id @default(uuid()) @db.Uuid
+  therapistId String    @db.Uuid
+  paidById    String    @db.Uuid
+  amount      Int
+  therapist   Therapist @relation(fields: [therapistId], references: [id])
+  paidBy      User      @relation(fields: [paidById], references: [id])
+  createdAt   DateTime  @default(now())
+
+  @@index([therapistId, createdAt])
+  @@index([createdAt])
+}

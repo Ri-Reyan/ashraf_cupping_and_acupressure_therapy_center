@@ -1,10 +1,13 @@
 model Patient {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String   @db.Text
-  mobile    BigInt
-  role      String   @db.Text
-  
-  books     Book[]
+  id           String        @id @default(uuid()) @db.Uuid
+  name         String
+  mobile       String        @unique
+  age          Int
+  gender       Gender
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
+  @@index([name])
   @@map("patient")
 }

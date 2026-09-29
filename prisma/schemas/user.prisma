@@ -1,14 +1,27 @@
-enum UserRole {
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum Role {
   ADMIN
-  STAFF
+  RECEPTIONIST
 }
 
 model User {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String   @db.Text
-  email     String   @unique @db.Text
-  mobile    Int
-  role      UserRole
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
+  id           String            @id @db.Uuid
+  name         String
+  email        String            @unique
+  passwordHash String?
+  mobile       String
+  role         Role
+  deletedAt    DateTime?
+  appointments Appointment[]
+  expenses     Expense[]
+  payouts      TherapistPayout[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([role, deletedAt])
 }

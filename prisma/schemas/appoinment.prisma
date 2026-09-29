@@ -1,0 +1,29 @@
+model Appointment {
+  id               String    @id @default(uuid()) @db.Uuid
+  invoiceNo        Int       @unique @default(autoincrement())
+  patientId        String    @db.Uuid
+  therapistId      String    @db.Uuid
+  createdById      String    @db.Uuid
+  services         String[]
+  isSession        Boolean   @default(false)
+  sessionGroupId   String?   @db.Uuid
+  sessionCount     Int?
+  currentCount     Int?
+  serialDate       DateTime  @db.Date
+  serial           Int
+  fee              Int
+  therapistPercent Int
+  therapistShare   Int
+  deletedAt        DateTime?
+  patient          Patient   @relation(fields: [patientId], references: [id])
+  therapist        Therapist @relation(fields: [therapistId], references: [id])
+  createdBy        User      @relation(fields: [createdById], references: [id])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([serialDate, serial])
+  @@index([patientId])
+  @@index([therapistId])
+  @@index([createdAt])
+  @@index([sessionGroupId])
+}

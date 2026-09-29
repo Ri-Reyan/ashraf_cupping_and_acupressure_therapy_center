@@ -1,9 +1,0 @@
-model Expenses {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String   @db.Text
-  amount    String   @db.Text
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-
-  @@map("expenses")
-}

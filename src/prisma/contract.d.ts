@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'9eba4bf74913dbc3a7a851c9e270c6b8deed55add2ea894602d0e49ae147edfc'>;
+  StorageHashBase<'6cd232c25016af38d2a4c836d476d8eeaaaed44b8cc400c9a128a3fdfd1611b2'>;
 export type ExecutionHash =
-  ExecutionHashBase<'baabf863de7f71c0b02ae9cd15f43d34e8f525637d0328eb3251bcf69fa9f69a'>;
+  ExecutionHashBase<'dff239d33a490bf02c66c6f1ae00d9adf253b48ccb47f472c8ec525952cee876'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -257,34 +257,45 @@ export type FieldOutputTypes = {
       readonly therapistId: CodecTypes['pg/uuid@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
-    readonly Book: {
+    readonly Appointment: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-      readonly current_count: CodecTypes['pg/int4@1']['output'];
-      readonly fee: CodecTypes['pg/int4@1']['output'] | null;
+      readonly createdById: CodecTypes['pg/uuid@1']['output'];
+      readonly currentCount: CodecTypes['pg/int4@1']['output'] | null;
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
+      readonly fee: CodecTypes['pg/int4@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly invoiceNo: CodecTypes['pg/int4@1']['output'];
       readonly isSession: CodecTypes['pg/bool@1']['output'];
       readonly patientId: CodecTypes['pg/uuid@1']['output'];
-      readonly paymentStatus: 'PENDING' | 'PAID' | 'PARTIAL';
       readonly serial: CodecTypes['pg/int4@1']['output'];
-      readonly service: ReadonlyArray<CodecTypes['pg/text@1']['output']> | null;
-      readonly session_count: CodecTypes['pg/int4@1']['output'] | null;
-      readonly therapistId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly serialDate: CodecTypes['pg/date-temporal@1']['output'];
+      readonly services: ReadonlyArray<CodecTypes['pg/text@1']['output']> | null;
+      readonly sessionCount: CodecTypes['pg/int4@1']['output'] | null;
+      readonly sessionGroupId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly therapistId: CodecTypes['pg/uuid@1']['output'];
+      readonly therapistPercent: CodecTypes['pg/int4@1']['output'];
+      readonly therapistShare: CodecTypes['pg/int4@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
-    readonly Expenses: {
-      readonly amount: CodecTypes['pg/text@1']['output'];
+    readonly Expense: {
+      readonly amount: CodecTypes['pg/int4@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+      readonly createdById: CodecTypes['pg/uuid@1']['output'];
+      readonly expenseDate: CodecTypes['pg/timestamp-temporal@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
     readonly Patient: {
+      readonly age: CodecTypes['pg/int4@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+      readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly mobile: CodecTypes['pg/int8@1']['output'];
+      readonly mobile: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
-      readonly role: CodecTypes['pg/text@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
-    readonly Services: {
+    readonly Service: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
@@ -293,23 +304,31 @@ export type FieldOutputTypes = {
     readonly Therapist: {
       readonly age: CodecTypes['pg/int4@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
       readonly education: CodecTypes['pg/text@1']['output'] | null;
-      readonly email: CodecTypes['pg/text@1']['output'];
       readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly location: CodecTypes['pg/text@1']['output'] | null;
-      readonly mobile: CodecTypes['pg/int4@1']['output'];
+      readonly mobile: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
-      readonly salary: CodecTypes['pg/int4@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+    };
+    readonly TherapistPayout: {
+      readonly amount: CodecTypes['pg/int4@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly paidById: CodecTypes['pg/uuid@1']['output'];
+      readonly therapistId: CodecTypes['pg/uuid@1']['output'];
     };
     readonly User: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
       readonly email: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly mobile: CodecTypes['pg/int4@1']['output'];
+      readonly mobile: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
-      readonly role: 'ADMIN' | 'STAFF';
+      readonly passwordHash: CodecTypes['pg/text@1']['output'] | null;
+      readonly role: 'ADMIN' | 'RECEPTIONIST';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
   };
@@ -323,34 +342,45 @@ export type FieldInputTypes = {
       readonly therapistId: CodecTypes['pg/uuid@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
-    readonly Book: {
+    readonly Appointment: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
-      readonly current_count: CodecTypes['pg/int4@1']['input'];
-      readonly fee: CodecTypes['pg/int4@1']['input'] | null;
+      readonly createdById: CodecTypes['pg/uuid@1']['input'];
+      readonly currentCount: CodecTypes['pg/int4@1']['input'] | null;
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['input'] | null;
+      readonly fee: CodecTypes['pg/int4@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly invoiceNo: CodecTypes['pg/int4@1']['input'];
       readonly isSession: CodecTypes['pg/bool@1']['input'];
       readonly patientId: CodecTypes['pg/uuid@1']['input'];
-      readonly paymentStatus: 'PENDING' | 'PAID' | 'PARTIAL';
       readonly serial: CodecTypes['pg/int4@1']['input'];
-      readonly service: ReadonlyArray<CodecTypes['pg/text@1']['input']> | null;
-      readonly session_count: CodecTypes['pg/int4@1']['input'] | null;
-      readonly therapistId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly serialDate: CodecTypes['pg/date-temporal@1']['input'];
+      readonly services: ReadonlyArray<CodecTypes['pg/text@1']['input']> | null;
+      readonly sessionCount: CodecTypes['pg/int4@1']['input'] | null;
+      readonly sessionGroupId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly therapistId: CodecTypes['pg/uuid@1']['input'];
+      readonly therapistPercent: CodecTypes['pg/int4@1']['input'];
+      readonly therapistShare: CodecTypes['pg/int4@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
-    readonly Expenses: {
-      readonly amount: CodecTypes['pg/text@1']['input'];
+    readonly Expense: {
+      readonly amount: CodecTypes['pg/int4@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+      readonly createdById: CodecTypes['pg/uuid@1']['input'];
+      readonly expenseDate: CodecTypes['pg/timestamp-temporal@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
     readonly Patient: {
+      readonly age: CodecTypes['pg/int4@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+      readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly mobile: CodecTypes['pg/int8@1']['input'];
+      readonly mobile: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
-      readonly role: CodecTypes['pg/text@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
-    readonly Services: {
+    readonly Service: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
@@ -359,23 +389,31 @@ export type FieldInputTypes = {
     readonly Therapist: {
       readonly age: CodecTypes['pg/int4@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['input'] | null;
       readonly education: CodecTypes['pg/text@1']['input'] | null;
-      readonly email: CodecTypes['pg/text@1']['input'];
       readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly location: CodecTypes['pg/text@1']['input'] | null;
-      readonly mobile: CodecTypes['pg/int4@1']['input'];
+      readonly mobile: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
-      readonly salary: CodecTypes['pg/int4@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+    };
+    readonly TherapistPayout: {
+      readonly amount: CodecTypes['pg/int4@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly paidById: CodecTypes['pg/uuid@1']['input'];
+      readonly therapistId: CodecTypes['pg/uuid@1']['input'];
     };
     readonly User: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['input'] | null;
       readonly email: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly mobile: CodecTypes['pg/int4@1']['input'];
+      readonly mobile: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
-      readonly role: 'ADMIN' | 'STAFF';
+      readonly passwordHash: CodecTypes['pg/text@1']['input'] | null;
+      readonly role: 'ADMIN' | 'RECEPTIONIST';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
   };
@@ -389,34 +427,45 @@ export type StorageColumnTypes = {
       readonly therapistId: CodecTypes['pg/uuid@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
-    readonly book: {
+    readonly Appointment: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-      readonly current_count: CodecTypes['pg/int4@1']['output'];
-      readonly fee: CodecTypes['pg/int4@1']['output'] | null;
+      readonly createdById: CodecTypes['pg/uuid@1']['output'];
+      readonly currentCount: CodecTypes['pg/int4@1']['output'] | null;
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
+      readonly fee: CodecTypes['pg/int4@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly invoiceNo: CodecTypes['pg/int4@1']['output'];
       readonly isSession: CodecTypes['pg/bool@1']['output'];
       readonly patientId: CodecTypes['pg/uuid@1']['output'];
-      readonly paymentStatus: 'PENDING' | 'PAID' | 'PARTIAL';
       readonly serial: CodecTypes['pg/int4@1']['output'];
-      readonly service: ReadonlyArray<CodecTypes['pg/text@1']['output']> | null;
-      readonly session_count: CodecTypes['pg/int4@1']['output'] | null;
-      readonly therapistId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly serialDate: CodecTypes['pg/date-temporal@1']['output'];
+      readonly services: ReadonlyArray<CodecTypes['pg/text@1']['output']> | null;
+      readonly sessionCount: CodecTypes['pg/int4@1']['output'] | null;
+      readonly sessionGroupId: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly therapistId: CodecTypes['pg/uuid@1']['output'];
+      readonly therapistPercent: CodecTypes['pg/int4@1']['output'];
+      readonly therapistShare: CodecTypes['pg/int4@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
-    readonly expenses: {
-      readonly amount: CodecTypes['pg/text@1']['output'];
+    readonly Expense: {
+      readonly amount: CodecTypes['pg/int4@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+      readonly createdById: CodecTypes['pg/uuid@1']['output'];
+      readonly expenseDate: CodecTypes['pg/timestamp-temporal@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
     readonly patient: {
+      readonly age: CodecTypes['pg/int4@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+      readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly mobile: CodecTypes['pg/int8@1']['output'];
+      readonly mobile: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
-      readonly role: CodecTypes['pg/text@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
-    readonly services: {
+    readonly Service: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
@@ -425,23 +474,31 @@ export type StorageColumnTypes = {
     readonly therapist: {
       readonly age: CodecTypes['pg/int4@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
       readonly education: CodecTypes['pg/text@1']['output'] | null;
-      readonly email: CodecTypes['pg/text@1']['output'];
       readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly location: CodecTypes['pg/text@1']['output'] | null;
-      readonly mobile: CodecTypes['pg/int4@1']['output'];
+      readonly mobile: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
-      readonly salary: CodecTypes['pg/int4@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+    };
+    readonly TherapistPayout: {
+      readonly amount: CodecTypes['pg/int4@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly paidById: CodecTypes['pg/uuid@1']['output'];
+      readonly therapistId: CodecTypes['pg/uuid@1']['output'];
     };
     readonly User: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
       readonly email: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly mobile: CodecTypes['pg/int4@1']['output'];
+      readonly mobile: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
-      readonly role: 'ADMIN' | 'STAFF';
+      readonly passwordHash: CodecTypes['pg/text@1']['output'] | null;
+      readonly role: 'ADMIN' | 'RECEPTIONIST';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
   };
@@ -455,34 +512,45 @@ export type StorageColumnInputTypes = {
       readonly therapistId: CodecTypes['pg/uuid@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
-    readonly book: {
+    readonly Appointment: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
-      readonly current_count: CodecTypes['pg/int4@1']['input'];
-      readonly fee: CodecTypes['pg/int4@1']['input'] | null;
+      readonly createdById: CodecTypes['pg/uuid@1']['input'];
+      readonly currentCount: CodecTypes['pg/int4@1']['input'] | null;
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['input'] | null;
+      readonly fee: CodecTypes['pg/int4@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly invoiceNo: CodecTypes['pg/int4@1']['input'];
       readonly isSession: CodecTypes['pg/bool@1']['input'];
       readonly patientId: CodecTypes['pg/uuid@1']['input'];
-      readonly paymentStatus: 'PENDING' | 'PAID' | 'PARTIAL';
       readonly serial: CodecTypes['pg/int4@1']['input'];
-      readonly service: ReadonlyArray<CodecTypes['pg/text@1']['input']> | null;
-      readonly session_count: CodecTypes['pg/int4@1']['input'] | null;
-      readonly therapistId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly serialDate: CodecTypes['pg/date-temporal@1']['input'];
+      readonly services: ReadonlyArray<CodecTypes['pg/text@1']['input']> | null;
+      readonly sessionCount: CodecTypes['pg/int4@1']['input'] | null;
+      readonly sessionGroupId: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly therapistId: CodecTypes['pg/uuid@1']['input'];
+      readonly therapistPercent: CodecTypes['pg/int4@1']['input'];
+      readonly therapistShare: CodecTypes['pg/int4@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
-    readonly expenses: {
-      readonly amount: CodecTypes['pg/text@1']['input'];
+    readonly Expense: {
+      readonly amount: CodecTypes['pg/int4@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+      readonly createdById: CodecTypes['pg/uuid@1']['input'];
+      readonly expenseDate: CodecTypes['pg/timestamp-temporal@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
     readonly patient: {
+      readonly age: CodecTypes['pg/int4@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+      readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly mobile: CodecTypes['pg/int8@1']['input'];
+      readonly mobile: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
-      readonly role: CodecTypes['pg/text@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
-    readonly services: {
+    readonly Service: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
@@ -491,23 +559,31 @@ export type StorageColumnInputTypes = {
     readonly therapist: {
       readonly age: CodecTypes['pg/int4@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['input'] | null;
       readonly education: CodecTypes['pg/text@1']['input'] | null;
-      readonly email: CodecTypes['pg/text@1']['input'];
       readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly location: CodecTypes['pg/text@1']['input'] | null;
-      readonly mobile: CodecTypes['pg/int4@1']['input'];
+      readonly mobile: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
-      readonly salary: CodecTypes['pg/int4@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+    };
+    readonly TherapistPayout: {
+      readonly amount: CodecTypes['pg/int4@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly paidById: CodecTypes['pg/uuid@1']['input'];
+      readonly therapistId: CodecTypes['pg/uuid@1']['input'];
     };
     readonly User: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
+      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['input'] | null;
       readonly email: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly mobile: CodecTypes['pg/int4@1']['input'];
+      readonly mobile: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
-      readonly role: 'ADMIN' | 'STAFF';
+      readonly passwordHash: CodecTypes['pg/text@1']['input'] | null;
+      readonly role: 'ADMIN' | 'RECEPTIONIST';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
   };
@@ -523,40 +599,53 @@ export namespace Models {
     therapist: public_Therapist;
     readonly [RelationKeys]?: 'therapist';
   };
-  export type public_Book = {
+  export type public_Appointment = {
     createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-    current_count: CodecTypes['pg/int4@1']['output'];
-    fee: CodecTypes['pg/int4@1']['output'] | null;
+    createdById: CodecTypes['pg/uuid@1']['output'];
+    currentCount: CodecTypes['pg/int4@1']['output'] | null;
+    deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
+    fee: CodecTypes['pg/int4@1']['output'];
     id: CodecTypes['pg/uuid@1']['output'];
+    invoiceNo: CodecTypes['pg/int4@1']['output'];
     isSession: CodecTypes['pg/bool@1']['output'];
     patientId: CodecTypes['pg/uuid@1']['output'];
-    paymentStatus: 'PENDING' | 'PAID' | 'PARTIAL';
     serial: CodecTypes['pg/int4@1']['output'];
-    service: ReadonlyArray<CodecTypes['pg/text@1']['output']> | null;
-    session_count: CodecTypes['pg/int4@1']['output'] | null;
-    therapistId: CodecTypes['pg/uuid@1']['output'] | null;
+    serialDate: CodecTypes['pg/date-temporal@1']['output'];
+    services: ReadonlyArray<CodecTypes['pg/text@1']['output']> | null;
+    sessionCount: CodecTypes['pg/int4@1']['output'] | null;
+    sessionGroupId: CodecTypes['pg/uuid@1']['output'] | null;
+    therapistId: CodecTypes['pg/uuid@1']['output'];
+    therapistPercent: CodecTypes['pg/int4@1']['output'];
+    therapistShare: CodecTypes['pg/int4@1']['output'];
     updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+    createdBy: public_User;
     patient: public_Patient;
-    therapist: public_Therapist | null;
-    readonly [RelationKeys]?: 'patient' | 'therapist';
+    therapist: public_Therapist;
+    readonly [RelationKeys]?: 'createdBy' | 'patient' | 'therapist';
   };
-  export type public_Expenses = {
-    amount: CodecTypes['pg/text@1']['output'];
+  export type public_Expense = {
+    amount: CodecTypes['pg/int4@1']['output'];
     createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+    createdById: CodecTypes['pg/uuid@1']['output'];
+    expenseDate: CodecTypes['pg/timestamp-temporal@1']['output'];
     id: CodecTypes['pg/uuid@1']['output'];
     name: CodecTypes['pg/text@1']['output'];
     updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-    readonly [RelationKeys]?: never;
+    createdBy: public_User;
+    readonly [RelationKeys]?: 'createdBy';
   };
   export type public_Patient = {
+    age: CodecTypes['pg/int4@1']['output'];
+    createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+    gender: 'MALE' | 'FEMALE' | 'OTHER';
     id: CodecTypes['pg/uuid@1']['output'];
-    mobile: CodecTypes['pg/int8@1']['output'];
+    mobile: CodecTypes['pg/text@1']['output'];
     name: CodecTypes['pg/text@1']['output'];
-    role: CodecTypes['pg/text@1']['output'];
-    books: public_Book[];
-    readonly [RelationKeys]?: 'books';
+    updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+    appointments: public_Appointment[];
+    readonly [RelationKeys]?: 'appointments';
   };
-  export type public_Services = {
+  export type public_Service = {
     createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     id: CodecTypes['pg/uuid@1']['output'];
     name: CodecTypes['pg/text@1']['output'];
@@ -566,39 +655,55 @@ export namespace Models {
   export type public_Therapist = {
     age: CodecTypes['pg/int4@1']['output'];
     createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+    deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
     education: CodecTypes['pg/text@1']['output'] | null;
-    email: CodecTypes['pg/text@1']['output'];
     gender: 'MALE' | 'FEMALE' | 'OTHER';
     id: CodecTypes['pg/uuid@1']['output'];
     location: CodecTypes['pg/text@1']['output'] | null;
-    mobile: CodecTypes['pg/int4@1']['output'];
+    mobile: CodecTypes['pg/text@1']['output'];
     name: CodecTypes['pg/text@1']['output'];
-    salary: CodecTypes['pg/int4@1']['output'];
     updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     advances: public_Advance[];
-    books: public_Book[];
-    readonly [RelationKeys]?: 'advances' | 'books';
+    appointments: public_Appointment[];
+    payouts: public_TherapistPayout[];
+    readonly [RelationKeys]?: 'advances' | 'appointments' | 'payouts';
+  };
+  export type public_TherapistPayout = {
+    amount: CodecTypes['pg/int4@1']['output'];
+    createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+    id: CodecTypes['pg/uuid@1']['output'];
+    paidById: CodecTypes['pg/uuid@1']['output'];
+    therapistId: CodecTypes['pg/uuid@1']['output'];
+    paidBy: public_User;
+    therapist: public_Therapist;
+    readonly [RelationKeys]?: 'paidBy' | 'therapist';
   };
   export type public_User = {
     createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
+    deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
     email: CodecTypes['pg/text@1']['output'];
     id: CodecTypes['pg/uuid@1']['output'];
-    mobile: CodecTypes['pg/int4@1']['output'];
+    mobile: CodecTypes['pg/text@1']['output'];
     name: CodecTypes['pg/text@1']['output'];
-    role: 'ADMIN' | 'STAFF';
+    passwordHash: CodecTypes['pg/text@1']['output'] | null;
+    role: 'ADMIN' | 'RECEPTIONIST';
     updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-    readonly [RelationKeys]?: never;
+    appointments: public_Appointment[];
+    expenses: public_Expense[];
+    payouts: public_TherapistPayout[];
+    readonly [RelationKeys]?: 'appointments' | 'expenses' | 'payouts';
   };
 }
 
 export declare const models: {
   public: {
     Advance: Models.public_Advance;
-    Book: Models.public_Book;
-    Expenses: Models.public_Expenses;
+    Appointment: Models.public_Appointment;
+    Expense: Models.public_Expense;
     Patient: Models.public_Patient;
-    Services: Models.public_Services;
+    Service: Models.public_Service;
     Therapist: Models.public_Therapist;
+    TherapistPayout: Models.public_TherapistPayout;
     User: Models.public_User;
   };
 };
@@ -674,85 +779,150 @@ type ContractBase = Omit<
                 },
               ];
             };
-            readonly book: {
+            readonly Appointment: {
               columns: {
                 readonly createdAt: {
                   readonly nativeType: 'timestamp';
                   readonly codecId: 'pg/timestamp-temporal@1';
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
-                readonly current_count: {
+                readonly createdById: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly currentCount: {
                   readonly nativeType: 'int4';
                   readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
+                  readonly nullable: true;
+                };
+                readonly deletedAt: {
+                  readonly nativeType: 'timestamp';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly precision: 3 };
                 };
                 readonly fee: {
                   readonly nativeType: 'int4';
                   readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
+                  readonly nullable: false;
                 };
                 readonly id: {
                   readonly nativeType: 'uuid';
                   readonly codecId: 'pg/uuid@1';
                   readonly nullable: false;
+                };
+                readonly invoiceNo: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
                   readonly default: {
                     readonly kind: 'function';
-                    readonly expression: 'gen_random_uuid()';
+                    readonly expression: 'autoincrement()';
                   };
                 };
                 readonly isSession: {
                   readonly nativeType: 'bool';
                   readonly codecId: 'pg/bool@1';
                   readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
                 };
                 readonly patientId: {
                   readonly nativeType: 'uuid';
                   readonly codecId: 'pg/uuid@1';
                   readonly nullable: false;
                 };
-                readonly paymentStatus: {
-                  readonly nativeType: 'PaymentStatus';
-                  readonly codecId: 'pg/enum@1';
-                  readonly nullable: false;
-                  readonly typeParams: { readonly typeName: 'PaymentStatus' };
-                };
                 readonly serial: {
                   readonly nativeType: 'int4';
                   readonly codecId: 'pg/int4@1';
                   readonly nullable: false;
                 };
-                readonly service: {
+                readonly serialDate: {
+                  readonly nativeType: 'date';
+                  readonly codecId: 'pg/date-temporal@1';
+                  readonly nullable: false;
+                };
+                readonly services: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
                 };
-                readonly session_count: {
+                readonly sessionCount: {
                   readonly nativeType: 'int4';
                   readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly sessionGroupId: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
                   readonly nullable: true;
                 };
                 readonly therapistId: {
                   readonly nativeType: 'uuid';
                   readonly codecId: 'pg/uuid@1';
-                  readonly nullable: true;
+                  readonly nullable: false;
+                };
+                readonly therapistPercent: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly therapistShare: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
                 };
                 readonly updatedAt: {
                   readonly nativeType: 'timestamp';
                   readonly codecId: 'pg/timestamp-temporal@1';
                   readonly nullable: false;
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
-              indexes: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'Appointment_createdAt_idx';
+                  readonly columns: readonly ['createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'Appointment_invoiceNo_key';
+                  readonly columns: readonly ['invoiceNo'];
+                  readonly unique: true;
+                },
+                {
+                  readonly name: 'Appointment_patientId_idx';
+                  readonly columns: readonly ['patientId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'Appointment_serialDate_serial_key';
+                  readonly columns: readonly ['serialDate', 'serial'];
+                  readonly unique: true;
+                },
+                {
+                  readonly name: 'Appointment_sessionGroupId_idx';
+                  readonly columns: readonly ['sessionGroupId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'Appointment_therapistId_idx';
+                  readonly columns: readonly ['therapistId'];
+                  readonly unique: false;
+                },
+              ];
               foreignKeys: readonly [
                 {
                   readonly source: {
                     readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'book';
+                    readonly tableName: 'Appointment';
                     readonly columns: readonly ['patientId'];
                   };
                   readonly target: {
@@ -764,7 +934,7 @@ type ContractBase = Omit<
                 {
                   readonly source: {
                     readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'book';
+                    readonly tableName: 'Appointment';
                     readonly columns: readonly ['therapistId'];
                   };
                   readonly target: {
@@ -773,13 +943,25 @@ type ContractBase = Omit<
                     readonly columns: readonly ['id'];
                   };
                 },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Appointment';
+                    readonly columns: readonly ['createdById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'User';
+                    readonly columns: readonly ['id'];
+                  };
+                },
               ];
             };
-            readonly expenses: {
+            readonly Expense: {
               columns: {
                 readonly amount: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
                   readonly nullable: false;
                 };
                 readonly createdAt: {
@@ -787,16 +969,24 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamp-temporal@1';
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+                readonly createdById: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly expenseDate: {
+                  readonly nativeType: 'timestamp';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
                 };
                 readonly id: {
                   readonly nativeType: 'uuid';
                   readonly codecId: 'pg/uuid@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'function';
-                    readonly expression: 'gen_random_uuid()';
-                  };
                 };
                 readonly name: {
                   readonly nativeType: 'text';
@@ -807,63 +997,62 @@ type ContractBase = Omit<
                   readonly nativeType: 'timestamp';
                   readonly codecId: 'pg/timestamp-temporal@1';
                   readonly nullable: false;
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
-              indexes: readonly [];
-              foreignKeys: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'Expense_expenseDate_idx';
+                  readonly columns: readonly ['expenseDate'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Expense';
+                    readonly columns: readonly ['createdById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'User';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
             };
             readonly patient: {
               columns: {
-                readonly id: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'function';
-                    readonly expression: 'gen_random_uuid()';
-                  };
-                };
-                readonly mobile: {
-                  readonly nativeType: 'int8';
-                  readonly codecId: 'pg/int8@1';
+                readonly age: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
                   readonly nullable: false;
                 };
-                readonly name: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly role: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [];
-              indexes: readonly [];
-              foreignKeys: readonly [];
-            };
-            readonly services: {
-              columns: {
                 readonly createdAt: {
                   readonly nativeType: 'timestamp';
                   readonly codecId: 'pg/timestamp-temporal@1';
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+                readonly gender: {
+                  readonly nativeType: 'Gender';
+                  readonly codecId: 'pg/enum@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly typeName: 'Gender' };
                 };
                 readonly id: {
                   readonly nativeType: 'uuid';
                   readonly codecId: 'pg/uuid@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'function';
-                    readonly expression: 'gen_random_uuid()';
-                  };
+                };
+                readonly mobile: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
                 };
                 readonly name: {
                   readonly nativeType: 'text';
@@ -874,12 +1063,60 @@ type ContractBase = Omit<
                   readonly nativeType: 'timestamp';
                   readonly codecId: 'pg/timestamp-temporal@1';
                   readonly nullable: false;
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
-              indexes: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'patient_mobile_key';
+                  readonly columns: readonly ['mobile'];
+                  readonly unique: true;
+                },
+                {
+                  readonly name: 'patient_name_idx';
+                  readonly columns: readonly ['name'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [];
+            };
+            readonly Service: {
+              columns: {
+                readonly createdAt: {
+                  readonly nativeType: 'timestamp';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly name: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly updatedAt: {
+                  readonly nativeType: 'timestamp';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'Service_name_key';
+                  readonly columns: readonly ['name'];
+                  readonly unique: true;
+                },
+              ];
               foreignKeys: readonly [];
             };
             readonly therapist: {
@@ -894,17 +1131,18 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamp-temporal@1';
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+                readonly deletedAt: {
+                  readonly nativeType: 'timestamp';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly precision: 3 };
                 };
                 readonly education: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
-                };
-                readonly email: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
                 };
                 readonly gender: {
                   readonly nativeType: 'Gender';
@@ -916,10 +1154,6 @@ type ContractBase = Omit<
                   readonly nativeType: 'uuid';
                   readonly codecId: 'pg/uuid@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'function';
-                    readonly expression: 'gen_random_uuid()';
-                  };
                 };
                 readonly location: {
                   readonly nativeType: 'text';
@@ -927,8 +1161,8 @@ type ContractBase = Omit<
                   readonly nullable: true;
                 };
                 readonly mobile: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
                 readonly name: {
@@ -936,28 +1170,94 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
-                readonly salary: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                };
                 readonly updatedAt: {
                   readonly nativeType: 'timestamp';
                   readonly codecId: 'pg/timestamp-temporal@1';
                   readonly nullable: false;
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
               indexes: readonly [
                 {
-                  readonly name: 'therapist_email_key';
-                  readonly columns: readonly ['email'];
-                  readonly unique: true;
+                  readonly name: 'therapist_deletedAt_idx';
+                  readonly columns: readonly ['deletedAt'];
+                  readonly unique: false;
                 },
               ];
               foreignKeys: readonly [];
+            };
+            readonly TherapistPayout: {
+              columns: {
+                readonly amount: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamp';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly paidById: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly therapistId: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'TherapistPayout_createdAt_idx';
+                  readonly columns: readonly ['createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'TherapistPayout_therapistId_createdAt_idx';
+                  readonly columns: readonly ['therapistId', 'createdAt'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'TherapistPayout';
+                    readonly columns: readonly ['therapistId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'therapist';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'TherapistPayout';
+                    readonly columns: readonly ['paidById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'User';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
             };
             readonly User: {
               columns: {
@@ -966,7 +1266,13 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamp-temporal@1';
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+                readonly deletedAt: {
+                  readonly nativeType: 'timestamp';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly precision: 3 };
                 };
                 readonly email: {
                   readonly nativeType: 'text';
@@ -977,14 +1283,10 @@ type ContractBase = Omit<
                   readonly nativeType: 'uuid';
                   readonly codecId: 'pg/uuid@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'function';
-                    readonly expression: 'gen_random_uuid()';
-                  };
                 };
                 readonly mobile: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
                 readonly name: {
@@ -992,17 +1294,22 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
+                readonly passwordHash: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
                 readonly role: {
-                  readonly nativeType: 'UserRole';
+                  readonly nativeType: 'Role';
                   readonly codecId: 'pg/enum@1';
                   readonly nullable: false;
-                  readonly typeParams: { readonly typeName: 'UserRole' };
+                  readonly typeParams: { readonly typeName: 'Role' };
                 };
                 readonly updatedAt: {
                   readonly nativeType: 'timestamp';
                   readonly codecId: 'pg/timestamp-temporal@1';
                   readonly nullable: false;
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
@@ -1013,6 +1320,11 @@ type ContractBase = Omit<
                   readonly columns: readonly ['email'];
                   readonly unique: true;
                 },
+                {
+                  readonly name: 'User_role_deletedAt_idx';
+                  readonly columns: readonly ['role', 'deletedAt'];
+                  readonly unique: false;
+                },
               ];
               foreignKeys: readonly [];
             };
@@ -1022,13 +1334,9 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['MALE', 'FEMALE', 'OTHER'];
             };
-            readonly PaymentStatus: {
+            readonly Role: {
               readonly kind: 'valueSet';
-              readonly values: readonly ['PENDING', 'PAID', 'PARTIAL'];
-            };
-            readonly UserRole: {
-              readonly kind: 'valueSet';
-              readonly values: readonly ['ADMIN', 'STAFF'];
+              readonly values: readonly ['ADMIN', 'RECEPTIONIST'];
             };
           };
         };
@@ -1041,12 +1349,19 @@ type ContractBase = Omit<
   readonly target: 'postgres';
   readonly targetFamily: 'sql';
   readonly roots: {
+    readonly Appointment: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'Appointment';
+    };
+    readonly Expense: { readonly namespace: 'public' & NamespaceId; readonly model: 'Expense' };
+    readonly Service: { readonly namespace: 'public' & NamespaceId; readonly model: 'Service' };
+    readonly TherapistPayout: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'TherapistPayout';
+    };
     readonly User: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
     readonly advance: { readonly namespace: 'public' & NamespaceId; readonly model: 'Advance' };
-    readonly book: { readonly namespace: 'public' & NamespaceId; readonly model: 'Book' };
-    readonly expenses: { readonly namespace: 'public' & NamespaceId; readonly model: 'Expenses' };
     readonly patient: { readonly namespace: 'public' & NamespaceId; readonly model: 'Patient' };
-    readonly services: { readonly namespace: 'public' & NamespaceId; readonly model: 'Services' };
     readonly therapist: { readonly namespace: 'public' & NamespaceId; readonly model: 'Therapist' };
   };
   readonly domain: {
@@ -1110,27 +1425,43 @@ type ContractBase = Omit<
               };
             };
           };
-          readonly Book: {
+          readonly Appointment: {
             readonly fields: {
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
-              readonly current_count: {
+              readonly createdById: {
                 readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly currentCount: {
+                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
-              readonly fee: {
+              readonly deletedAt: {
                 readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly fee: {
+                readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
               readonly id: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly invoiceNo: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
               readonly isSession: {
                 readonly nullable: false;
@@ -1140,41 +1471,58 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
               };
-              readonly paymentStatus: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/enum@1';
-                  readonly typeParams: { readonly typeName: 'PaymentStatus' };
-                };
-              };
               readonly serial: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
-              readonly service: {
+              readonly serialDate: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/date-temporal@1' };
+              };
+              readonly services: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
                 readonly many: true;
               };
-              readonly session_count: {
+              readonly sessionCount: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
-              readonly therapistId: {
+              readonly sessionGroupId: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly therapistId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly therapistPercent: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly therapistShare: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
               readonly updatedAt: {
                 readonly nullable: false;
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
             };
             readonly relations: {
+              readonly createdBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['createdById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
               readonly patient: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -1193,7 +1541,7 @@ type ContractBase = Omit<
                   readonly model: 'Therapist';
                 };
                 readonly cardinality: 'N:1';
-                readonly nullable: true;
+                readonly nullable: false;
                 readonly on: {
                   readonly localFields: readonly ['therapistId'];
                   readonly targetFields: readonly ['id'];
@@ -1201,36 +1549,54 @@ type ContractBase = Omit<
               };
             };
             readonly storage: {
-              readonly table: 'book';
+              readonly table: 'Appointment';
               readonly namespaceId: 'public';
               readonly fields: {
                 readonly createdAt: { readonly column: 'createdAt' };
-                readonly current_count: { readonly column: 'current_count' };
+                readonly createdById: { readonly column: 'createdById' };
+                readonly currentCount: { readonly column: 'currentCount' };
+                readonly deletedAt: { readonly column: 'deletedAt' };
                 readonly fee: { readonly column: 'fee' };
                 readonly id: { readonly column: 'id' };
+                readonly invoiceNo: { readonly column: 'invoiceNo' };
                 readonly isSession: { readonly column: 'isSession' };
                 readonly patientId: { readonly column: 'patientId' };
-                readonly paymentStatus: { readonly column: 'paymentStatus' };
                 readonly serial: { readonly column: 'serial' };
-                readonly service: { readonly column: 'service' };
-                readonly session_count: { readonly column: 'session_count' };
+                readonly serialDate: { readonly column: 'serialDate' };
+                readonly services: { readonly column: 'services' };
+                readonly sessionCount: { readonly column: 'sessionCount' };
+                readonly sessionGroupId: { readonly column: 'sessionGroupId' };
                 readonly therapistId: { readonly column: 'therapistId' };
+                readonly therapistPercent: { readonly column: 'therapistPercent' };
+                readonly therapistShare: { readonly column: 'therapistShare' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
             };
           };
-          readonly Expenses: {
+          readonly Expense: {
             readonly fields: {
               readonly amount: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly createdById: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly expenseDate: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
               readonly id: {
@@ -1246,17 +1612,29 @@ type ContractBase = Omit<
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
             };
-            readonly relations: Record<string, never>;
+            readonly relations: {
+              readonly createdBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['createdById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
             readonly storage: {
-              readonly table: 'expenses';
+              readonly table: 'Expense';
               readonly namespaceId: 'public';
               readonly fields: {
                 readonly amount: { readonly column: 'amount' };
                 readonly createdAt: { readonly column: 'createdAt' };
+                readonly createdById: { readonly column: 'createdById' };
+                readonly expenseDate: { readonly column: 'expenseDate' };
                 readonly id: { readonly column: 'id' };
                 readonly name: { readonly column: 'name' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
@@ -1265,26 +1643,53 @@ type ContractBase = Omit<
           };
           readonly Patient: {
             readonly fields: {
+              readonly age: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly gender: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/enum@1';
+                  readonly typeParams: { readonly typeName: 'Gender' };
+                };
+              };
               readonly id: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
               };
               readonly mobile: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int8@1' };
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly name: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly role: {
+              readonly updatedAt: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
               };
             };
             readonly relations: {
-              readonly books: {
-                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Book' };
+              readonly appointments: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Appointment';
+                };
                 readonly cardinality: '1:N';
                 readonly on: {
                   readonly localFields: readonly ['id'];
@@ -1296,21 +1701,24 @@ type ContractBase = Omit<
               readonly table: 'patient';
               readonly namespaceId: 'public';
               readonly fields: {
+                readonly age: { readonly column: 'age' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly gender: { readonly column: 'gender' };
                 readonly id: { readonly column: 'id' };
                 readonly mobile: { readonly column: 'mobile' };
                 readonly name: { readonly column: 'name' };
-                readonly role: { readonly column: 'role' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
               };
             };
           };
-          readonly Services: {
+          readonly Service: {
             readonly fields: {
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
               readonly id: {
@@ -1326,13 +1734,13 @@ type ContractBase = Omit<
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
             };
             readonly relations: Record<string, never>;
             readonly storage: {
-              readonly table: 'services';
+              readonly table: 'Service';
               readonly namespaceId: 'public';
               readonly fields: {
                 readonly createdAt: { readonly column: 'createdAt' };
@@ -1353,15 +1761,19 @@ type ContractBase = Omit<
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly deletedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
               readonly education: {
                 readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly email: {
-                readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly gender: {
@@ -1382,22 +1794,18 @@ type ContractBase = Omit<
               };
               readonly mobile: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly name: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly salary: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
               readonly updatedAt: {
                 readonly nullable: false;
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
             };
@@ -1413,8 +1821,22 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['therapistId'];
                 };
               };
-              readonly books: {
-                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Book' };
+              readonly appointments: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Appointment';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['therapistId'];
+                };
+              };
+              readonly payouts: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'TherapistPayout';
+                };
                 readonly cardinality: '1:N';
                 readonly on: {
                   readonly localFields: readonly ['id'];
@@ -1428,15 +1850,76 @@ type ContractBase = Omit<
               readonly fields: {
                 readonly age: { readonly column: 'age' };
                 readonly createdAt: { readonly column: 'createdAt' };
+                readonly deletedAt: { readonly column: 'deletedAt' };
                 readonly education: { readonly column: 'education' };
-                readonly email: { readonly column: 'email' };
                 readonly gender: { readonly column: 'gender' };
                 readonly id: { readonly column: 'id' };
                 readonly location: { readonly column: 'location' };
                 readonly mobile: { readonly column: 'mobile' };
                 readonly name: { readonly column: 'name' };
-                readonly salary: { readonly column: 'salary' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly TherapistPayout: {
+            readonly fields: {
+              readonly amount: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly paidById: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly therapistId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+            };
+            readonly relations: {
+              readonly paidBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['paidById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly therapist: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Therapist';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['therapistId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'TherapistPayout';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly amount: { readonly column: 'amount' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly paidById: { readonly column: 'paidById' };
+                readonly therapistId: { readonly column: 'therapistId' };
               };
             };
           };
@@ -1447,7 +1930,15 @@ type ContractBase = Omit<
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly deletedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamp-temporal@1';
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
               readonly email: {
@@ -1460,10 +1951,14 @@ type ContractBase = Omit<
               };
               readonly mobile: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly name: {
                 readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly passwordHash: {
+                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly role: {
@@ -1471,7 +1966,7 @@ type ContractBase = Omit<
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/enum@1';
-                  readonly typeParams: { readonly typeName: 'UserRole' };
+                  readonly typeParams: { readonly typeName: 'Role' };
                 };
               };
               readonly updatedAt: {
@@ -1479,20 +1974,56 @@ type ContractBase = Omit<
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 6 };
+                  readonly typeParams: { readonly precision: 3 };
                 };
               };
             };
-            readonly relations: Record<string, never>;
+            readonly relations: {
+              readonly appointments: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Appointment';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['createdById'];
+                };
+              };
+              readonly expenses: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Expense';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['createdById'];
+                };
+              };
+              readonly payouts: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'TherapistPayout';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['paidById'];
+                };
+              };
+            };
             readonly storage: {
               readonly table: 'User';
               readonly namespaceId: 'public';
               readonly fields: {
                 readonly createdAt: { readonly column: 'createdAt' };
+                readonly deletedAt: { readonly column: 'deletedAt' };
                 readonly email: { readonly column: 'email' };
                 readonly id: { readonly column: 'id' };
                 readonly mobile: { readonly column: 'mobile' };
                 readonly name: { readonly column: 'name' };
+                readonly passwordHash: { readonly column: 'passwordHash' };
                 readonly role: { readonly column: 'role' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
@@ -1528,6 +2059,65 @@ type ContractBase = Omit<
     readonly mutations: {
       readonly defaults: readonly [
         {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Appointment';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
+          readonly onUpdate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Appointment';
+            readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Expense';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
+          readonly onUpdate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Expense';
+            readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Service';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
+          readonly onUpdate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Service';
+            readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'TherapistPayout';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
           readonly onCreate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
           readonly onUpdate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
           readonly ref: {
@@ -1546,11 +2136,10 @@ type ContractBase = Omit<
           };
         },
         {
-          readonly onCreate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
-          readonly onUpdate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'book';
-            readonly field: 'updatedAt';
+            readonly entry: 'patient';
+            readonly field: 'id';
             readonly namespace: 'public';
           };
         },
@@ -1558,17 +2147,16 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
           readonly onUpdate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'expenses';
+            readonly entry: 'patient';
             readonly field: 'updatedAt';
             readonly namespace: 'public';
           };
         },
         {
-          readonly onCreate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
-          readonly onUpdate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'services';
-            readonly field: 'updatedAt';
+            readonly entry: 'therapist';
+            readonly field: 'id';
             readonly namespace: 'public';
           };
         },

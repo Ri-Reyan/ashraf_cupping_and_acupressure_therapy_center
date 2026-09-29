@@ -11,7 +11,7 @@ const menulist = [
 ];
 
 const Menubar = () => {
-  const { isMenuOpen } = useLanding();
+  const { isMenuOpen, setIsMenuOpen } = useLanding();
   const url = usePathname();
 
   if (!isMenuOpen) return null;
@@ -22,6 +22,7 @@ const Menubar = () => {
         const isActive = url.startsWith(item.route);
         return (
           <Link
+            onClick={() => setIsMenuOpen((prev) => !prev)}
             key={item.id}
             href={item.route}
             className={`block px-4 py-2.5 rounded-lg text-sm font-serif transition-colors ${
