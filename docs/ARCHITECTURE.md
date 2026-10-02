@@ -125,3 +125,12 @@ The following flows remain part of the target architecture and are not implement
 2. The expense repository queries `[month start, next month start)` using Dhaka-local `PlainDateTime` timestamps and returns the month total with newest expenses first.
 3. Create defaults to today's Dhaka calendar date; selected date-only values are stored as local midnight timestamps.
 4. ADMIN can edit/delete any expense. RECEPTIONIST can edit/delete only records dated today in Asia/Dhaka, and edits must keep that date. Server actions enforce the policy inside the mutation service.
+
+## Implemented Phase 7 Flow
+
+### Dashboard Analytics
+
+1. `/dashboard` authenticates staff; monthly totals, trends, and therapist rankings are loaded only for ADMIN.
+2. `src/lib/services/analytics.ts` uses Prisma aggregate/groupBy operations for active appointment income, expense totals, distinct patients, daily series, and therapist fees; payout totals use one sum per Dhaka month.
+3. Month boundaries use Asia/Dhaka calendar dates. Timestamp payout bounds are converted to UTC PlainDateTime for the current PostgreSQL timestamp contract.
+4. Aggregated rows are zero-filled into daily and six-month chart series before being passed to the client-only Recharts component.
