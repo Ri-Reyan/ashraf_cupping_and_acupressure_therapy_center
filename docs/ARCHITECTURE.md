@@ -38,6 +38,14 @@
 5. `src/lib/auth.ts` verifies the session and loads the current `User` row, rejecting missing, soft-deleted, or non-staff rows.
 6. The dashboard sidebar hides role-restricted links. Each protected feature must still enforce its role in a server-side guard or action.
 
+## Password Reset
+
+1. The login page links to `/forgot-password`; its form calls `requestPasswordReset` in the login Server Action module.
+2. The action validates and normalizes the email, applies a short Redis rate limit, and returns the same confirmation whether an active staff account exists or not.
+3. For an active ADMIN or RECEPTIONIST, the action creates a cryptographically random token, stores its SHA-256 key and user ID in Redis for 30 minutes, and sends the reset URL through the server-only Nodemailer helper.
+4. `/reset-password` submits the token and matching new password to `resetPassword`. The action atomically consumes the token with Redis `GETDEL`, rechecks that the user is active, hashes the password with Argon2, and updates `User.passwordHash`.
+5. SMTP uses `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `SMTP_FROM`; `APP_URL` supplies the public origin for reset links. Redis credentials use the existing `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` settings.
+
 ## Initial Admin
 
 After the database schema is migrated, set `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, and normalized `SEED_ADMIN_MOBILE` in `.env`; `SEED_ADMIN_NAME` is optional and defaults to the email's local part. Run `npm run seed:admin`. The command stores only the Argon2 hash and skips creation whenever an ADMIN row already exists.

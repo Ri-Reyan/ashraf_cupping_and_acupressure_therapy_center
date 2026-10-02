@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'6cd232c25016af38d2a4c836d476d8eeaaaed44b8cc400c9a128a3fdfd1611b2'>;
+  StorageHashBase<'6273396efe992ae0dda5789a6e8eeb88bbe3a6d6faab4ecee537d72e72801ff0'>;
 export type ExecutionHash =
   ExecutionHashBase<'dff239d33a490bf02c66c6f1ae00d9adf253b48ccb47f472c8ec525952cee876'>;
 export type ProfileHash =
@@ -304,13 +304,13 @@ export type FieldOutputTypes = {
     readonly Therapist: {
       readonly age: CodecTypes['pg/int4@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
       readonly education: CodecTypes['pg/text@1']['output'] | null;
       readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly location: CodecTypes['pg/text@1']['output'] | null;
       readonly mobile: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
+      readonly status: 'ACTIVE' | 'BLOCKED';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
     readonly TherapistPayout: {
@@ -322,13 +322,13 @@ export type FieldOutputTypes = {
     };
     readonly User: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
       readonly email: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly mobile: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly passwordHash: CodecTypes['pg/text@1']['output'] | null;
       readonly role: 'ADMIN' | 'RECEPTIONIST';
+      readonly status: 'ACTIVE' | 'BLOCKED';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
   };
@@ -389,13 +389,13 @@ export type FieldInputTypes = {
     readonly Therapist: {
       readonly age: CodecTypes['pg/int4@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
-      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['input'] | null;
       readonly education: CodecTypes['pg/text@1']['input'] | null;
       readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly location: CodecTypes['pg/text@1']['input'] | null;
       readonly mobile: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
+      readonly status: 'ACTIVE' | 'BLOCKED';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
     readonly TherapistPayout: {
@@ -407,13 +407,13 @@ export type FieldInputTypes = {
     };
     readonly User: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
-      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['input'] | null;
       readonly email: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly mobile: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly passwordHash: CodecTypes['pg/text@1']['input'] | null;
       readonly role: 'ADMIN' | 'RECEPTIONIST';
+      readonly status: 'ACTIVE' | 'BLOCKED';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
   };
@@ -474,13 +474,13 @@ export type StorageColumnTypes = {
     readonly therapist: {
       readonly age: CodecTypes['pg/int4@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
       readonly education: CodecTypes['pg/text@1']['output'] | null;
       readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly location: CodecTypes['pg/text@1']['output'] | null;
       readonly mobile: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
+      readonly status: 'ACTIVE' | 'BLOCKED';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
     readonly TherapistPayout: {
@@ -492,13 +492,13 @@ export type StorageColumnTypes = {
     };
     readonly User: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
       readonly email: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly mobile: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly passwordHash: CodecTypes['pg/text@1']['output'] | null;
       readonly role: 'ADMIN' | 'RECEPTIONIST';
+      readonly status: 'ACTIVE' | 'BLOCKED';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
   };
@@ -559,13 +559,13 @@ export type StorageColumnInputTypes = {
     readonly therapist: {
       readonly age: CodecTypes['pg/int4@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
-      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['input'] | null;
       readonly education: CodecTypes['pg/text@1']['input'] | null;
       readonly gender: 'MALE' | 'FEMALE' | 'OTHER';
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly location: CodecTypes['pg/text@1']['input'] | null;
       readonly mobile: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
+      readonly status: 'ACTIVE' | 'BLOCKED';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
     readonly TherapistPayout: {
@@ -577,13 +577,13 @@ export type StorageColumnInputTypes = {
     };
     readonly User: {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
-      readonly deletedAt: CodecTypes['pg/timestamp-temporal@1']['input'] | null;
       readonly email: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly mobile: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly passwordHash: CodecTypes['pg/text@1']['input'] | null;
       readonly role: 'ADMIN' | 'RECEPTIONIST';
+      readonly status: 'ACTIVE' | 'BLOCKED';
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
   };
@@ -655,13 +655,13 @@ export namespace Models {
   export type public_Therapist = {
     age: CodecTypes['pg/int4@1']['output'];
     createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-    deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
     education: CodecTypes['pg/text@1']['output'] | null;
     gender: 'MALE' | 'FEMALE' | 'OTHER';
     id: CodecTypes['pg/uuid@1']['output'];
     location: CodecTypes['pg/text@1']['output'] | null;
     mobile: CodecTypes['pg/text@1']['output'];
     name: CodecTypes['pg/text@1']['output'];
+    status: 'ACTIVE' | 'BLOCKED';
     updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     advances: public_Advance[];
     appointments: public_Appointment[];
@@ -680,13 +680,13 @@ export namespace Models {
   };
   export type public_User = {
     createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
-    deletedAt: CodecTypes['pg/timestamp-temporal@1']['output'] | null;
     email: CodecTypes['pg/text@1']['output'];
     id: CodecTypes['pg/uuid@1']['output'];
     mobile: CodecTypes['pg/text@1']['output'];
     name: CodecTypes['pg/text@1']['output'];
     passwordHash: CodecTypes['pg/text@1']['output'] | null;
     role: 'ADMIN' | 'RECEPTIONIST';
+    status: 'ACTIVE' | 'BLOCKED';
     updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     appointments: public_Appointment[];
     expenses: public_Expense[];
@@ -1133,12 +1133,6 @@ type ContractBase = Omit<
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                   readonly typeParams: { readonly precision: 3 };
                 };
-                readonly deletedAt: {
-                  readonly nativeType: 'timestamp';
-                  readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly nullable: true;
-                  readonly typeParams: { readonly precision: 3 };
-                };
                 readonly education: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
@@ -1170,6 +1164,12 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
+                readonly status: {
+                  readonly nativeType: 'Status';
+                  readonly codecId: 'pg/enum@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly typeName: 'Status' };
+                };
                 readonly updatedAt: {
                   readonly nativeType: 'timestamp';
                   readonly codecId: 'pg/timestamp-temporal@1';
@@ -1181,8 +1181,8 @@ type ContractBase = Omit<
               uniques: readonly [];
               indexes: readonly [
                 {
-                  readonly name: 'therapist_deletedAt_idx';
-                  readonly columns: readonly ['deletedAt'];
+                  readonly name: 'therapist_status_idx';
+                  readonly columns: readonly ['status'];
                   readonly unique: false;
                 },
               ];
@@ -1268,12 +1268,6 @@ type ContractBase = Omit<
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                   readonly typeParams: { readonly precision: 3 };
                 };
-                readonly deletedAt: {
-                  readonly nativeType: 'timestamp';
-                  readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly nullable: true;
-                  readonly typeParams: { readonly precision: 3 };
-                };
                 readonly email: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
@@ -1305,6 +1299,12 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly typeParams: { readonly typeName: 'Role' };
                 };
+                readonly status: {
+                  readonly nativeType: 'Status';
+                  readonly codecId: 'pg/enum@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly typeName: 'Status' };
+                };
                 readonly updatedAt: {
                   readonly nativeType: 'timestamp';
                   readonly codecId: 'pg/timestamp-temporal@1';
@@ -1321,8 +1321,8 @@ type ContractBase = Omit<
                   readonly unique: true;
                 },
                 {
-                  readonly name: 'User_role_deletedAt_idx';
-                  readonly columns: readonly ['role', 'deletedAt'];
+                  readonly name: 'User_role_status_idx';
+                  readonly columns: readonly ['role', 'status'];
                   readonly unique: false;
                 },
               ];
@@ -1337,6 +1337,10 @@ type ContractBase = Omit<
             readonly Role: {
               readonly kind: 'valueSet';
               readonly values: readonly ['ADMIN', 'RECEPTIONIST'];
+            };
+            readonly Status: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['ACTIVE', 'BLOCKED'];
             };
           };
         };
@@ -1764,14 +1768,6 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly precision: 3 };
                 };
               };
-              readonly deletedAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 3 };
-                };
-              };
               readonly education: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -1799,6 +1795,14 @@ type ContractBase = Omit<
               readonly name: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/enum@1';
+                  readonly typeParams: { readonly typeName: 'Status' };
+                };
               };
               readonly updatedAt: {
                 readonly nullable: false;
@@ -1850,13 +1854,13 @@ type ContractBase = Omit<
               readonly fields: {
                 readonly age: { readonly column: 'age' };
                 readonly createdAt: { readonly column: 'createdAt' };
-                readonly deletedAt: { readonly column: 'deletedAt' };
                 readonly education: { readonly column: 'education' };
                 readonly gender: { readonly column: 'gender' };
                 readonly id: { readonly column: 'id' };
                 readonly location: { readonly column: 'location' };
                 readonly mobile: { readonly column: 'mobile' };
                 readonly name: { readonly column: 'name' };
+                readonly status: { readonly column: 'status' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
             };
@@ -1933,14 +1937,6 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly precision: 3 };
                 };
               };
-              readonly deletedAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamp-temporal@1';
-                  readonly typeParams: { readonly precision: 3 };
-                };
-              };
               readonly email: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -1967,6 +1963,14 @@ type ContractBase = Omit<
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/enum@1';
                   readonly typeParams: { readonly typeName: 'Role' };
+                };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/enum@1';
+                  readonly typeParams: { readonly typeName: 'Status' };
                 };
               };
               readonly updatedAt: {
@@ -2018,13 +2022,13 @@ type ContractBase = Omit<
               readonly namespaceId: 'public';
               readonly fields: {
                 readonly createdAt: { readonly column: 'createdAt' };
-                readonly deletedAt: { readonly column: 'deletedAt' };
                 readonly email: { readonly column: 'email' };
                 readonly id: { readonly column: 'id' };
                 readonly mobile: { readonly column: 'mobile' };
                 readonly name: { readonly column: 'name' };
                 readonly passwordHash: { readonly column: 'passwordHash' };
                 readonly role: { readonly column: 'role' };
+                readonly status: { readonly column: 'status' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
             };

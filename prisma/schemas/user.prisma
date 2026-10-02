@@ -9,6 +9,11 @@ enum Role {
   RECEPTIONIST
 }
 
+enum Status {
+  ACTIVE
+  BLOCKED
+}
+
 model User {
   id           String            @id @db.Uuid
   name         String
@@ -16,12 +21,12 @@ model User {
   passwordHash String?
   mobile       String
   role         Role
-  deletedAt    DateTime?
+  status       Status
   appointments Appointment[]
   expenses     Expense[]
   payouts      TherapistPayout[]
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 
-  @@index([role, deletedAt])
+  @@index([role, status])
 }

@@ -664,16 +664,6 @@
                   }
                 }
               },
-              "deletedAt": {
-                "nullable": true,
-                "type": {
-                  "codecId": "pg/timestamp-temporal@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "precision": 3
-                  }
-                }
-              },
               "education": {
                 "nullable": true,
                 "type": {
@@ -717,6 +707,16 @@
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/enum@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "typeName": "Status"
+                  }
                 }
               },
               "updatedAt": {
@@ -785,9 +785,6 @@
                 "createdAt": {
                   "column": "createdAt"
                 },
-                "deletedAt": {
-                  "column": "deletedAt"
-                },
                 "education": {
                   "column": "education"
                 },
@@ -805,6 +802,9 @@
                 },
                 "name": {
                   "column": "name"
+                },
+                "status": {
+                  "column": "status"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -923,16 +923,6 @@
                   }
                 }
               },
-              "deletedAt": {
-                "nullable": true,
-                "type": {
-                  "codecId": "pg/timestamp-temporal@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "precision": 3
-                  }
-                }
-              },
               "email": {
                 "nullable": false,
                 "type": {
@@ -975,6 +965,16 @@
                   "kind": "scalar",
                   "typeParams": {
                     "typeName": "Role"
+                  }
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/enum@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "typeName": "Status"
                   }
                 }
               },
@@ -1041,9 +1041,6 @@
                 "createdAt": {
                   "column": "createdAt"
                 },
-                "deletedAt": {
-                  "column": "deletedAt"
-                },
                 "email": {
                   "column": "email"
                 },
@@ -1061,6 +1058,9 @@
                 },
                 "role": {
                   "column": "role"
+                },
+                "status": {
+                  "column": "status"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -1095,6 +1095,14 @@
                 "RECEPTIONIST"
               ],
               "typeName": "Role"
+            },
+            "Status": {
+              "kind": "postgres-enum",
+              "members": [
+                "ACTIVE",
+                "BLOCKED"
+              ],
+              "typeName": "Status"
             }
           },
           "table": {
@@ -1576,14 +1584,6 @@
                     "precision": 3
                   }
                 },
-                "deletedAt": {
-                  "codecId": "pg/timestamp-temporal@1",
-                  "nativeType": "timestamp",
-                  "nullable": true,
-                  "typeParams": {
-                    "precision": 3
-                  }
-                },
                 "email": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -1623,6 +1623,20 @@
                     "plane": "storage"
                   }
                 },
+                "status": {
+                  "codecId": "pg/enum@1",
+                  "nativeType": "Status",
+                  "nullable": false,
+                  "typeParams": {
+                    "typeName": "Status"
+                  },
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "Status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
                 "updatedAt": {
                   "codecId": "pg/timestamp-temporal@1",
                   "nativeType": "timestamp",
@@ -1644,9 +1658,9 @@
                 {
                   "columns": [
                     "role",
-                    "deletedAt"
+                    "status"
                   ],
-                  "name": "User_role_deletedAt_idx",
+                  "name": "User_role_status_idx",
                   "unique": false
                 }
               ],
@@ -1827,14 +1841,6 @@
                     "precision": 3
                   }
                 },
-                "deletedAt": {
-                  "codecId": "pg/timestamp-temporal@1",
-                  "nativeType": "timestamp",
-                  "nullable": true,
-                  "typeParams": {
-                    "precision": 3
-                  }
-                },
                 "education": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -1874,6 +1880,20 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "status": {
+                  "codecId": "pg/enum@1",
+                  "nativeType": "Status",
+                  "nullable": false,
+                  "typeParams": {
+                    "typeName": "Status"
+                  },
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "Status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
                 "updatedAt": {
                   "codecId": "pg/timestamp-temporal@1",
                   "nativeType": "timestamp",
@@ -1887,9 +1907,9 @@
               "indexes": [
                 {
                   "columns": [
-                    "deletedAt"
+                    "status"
                   ],
-                  "name": "therapist_deletedAt_idx",
+                  "name": "therapist_status_idx",
                   "unique": false
                 }
               ],
@@ -1916,6 +1936,13 @@
                 "ADMIN",
                 "RECEPTIONIST"
               ]
+            },
+            "Status": {
+              "kind": "valueSet",
+              "values": [
+                "ACTIVE",
+                "BLOCKED"
+              ]
             }
           }
         },
@@ -1923,7 +1950,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "6cd232c25016af38d2a4c836d476d8eeaaaed44b8cc400c9a128a3fdfd1611b2"
+    "storageHash": "6273396efe992ae0dda5789a6e8eeb88bbe3a6d6faab4ecee537d72e72801ff0"
   },
   "execution": {
     "executionHash": "dff239d33a490bf02c66c6f1ae00d9adf253b48ccb47f472c8ec525952cee876",

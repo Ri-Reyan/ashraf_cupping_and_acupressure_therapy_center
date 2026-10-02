@@ -21,7 +21,7 @@ export async function requireUser() {
   }
 
   const user = await prisma.orm.public.User.where({ id: userId! }).first();
-  if (!user || user.deletedAt) {
+  if (!user || user.status === "BLOCKED") {
     redirect("/login");
   }
   const role: StaffRole | null =

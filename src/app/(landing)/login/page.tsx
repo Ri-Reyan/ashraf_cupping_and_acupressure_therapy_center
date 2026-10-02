@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { loginWithPassword } from "@/app/(landing)/login/actions";
 
@@ -106,6 +107,15 @@ export default function LoginPage() {
                   />
                 </span>
               </label>
+
+              <div className="-mt-2 text-right">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-medium text-[#116c61] underline-offset-4 hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
 
               <button
                 type="submit"

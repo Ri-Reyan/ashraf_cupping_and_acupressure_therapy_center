@@ -1,5 +1,5 @@
 model Advance {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
   therapistId String   @db.Uuid
   amount      Int
   createdAt   DateTime @default(now()) @db.Timestamp(6)

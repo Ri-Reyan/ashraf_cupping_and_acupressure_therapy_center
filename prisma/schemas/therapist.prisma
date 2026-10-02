@@ -6,13 +6,13 @@ model Therapist {
   education    String?
   age          Int
   gender       Gender
-  deletedAt    DateTime?
+  status       Status
   appointments Appointment[]
   payouts      TherapistPayout[]
   advances     Advance[]        
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 
-  @@index([deletedAt])
+  @@index([status])
   @@map("therapist")
 }

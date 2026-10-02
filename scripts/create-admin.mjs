@@ -1,7 +1,6 @@
 // Creates the initial admin account for database-backed login.
 // Run once from a trusted terminal after the schema migration is applied.
 import "dotenv/config";
-import "temporal-polyfill/full/global";
 import { randomUUID } from "node:crypto";
 import { stdout } from "node:process";
 import argon2 from "argon2";
