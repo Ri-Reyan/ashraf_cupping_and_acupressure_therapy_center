@@ -116,3 +116,12 @@ The following flows remain part of the target architecture and are not implement
 2. `/dashboard/patients/[id]` shows patient details, active visits with invoice links, unfinished session packages based on each package's latest active visit, and total fees from active visits.
 3. ADMIN can edit patient details; RECEPTIONIST sees the profile read-only.
 4. Patient deletion is hard delete only when no appointment row references the patient. The server action requires ADMIN and the service rechecks the constraint in a Prisma transaction, counting soft-deleted appointments too.
+
+## Implemented Phase 6 Flow
+
+### Expenses
+
+1. `/dashboard/expenses` reads the selected `month` from the URL and defaults it to the current Asia/Dhaka month.
+2. The expense repository queries `[month start, next month start)` using Dhaka-local `PlainDateTime` timestamps and returns the month total with newest expenses first.
+3. Create defaults to today's Dhaka calendar date; selected date-only values are stored as local midnight timestamps.
+4. ADMIN can edit/delete any expense. RECEPTIONIST can edit/delete only records dated today in Asia/Dhaka, and edits must keep that date. Server actions enforce the policy inside the mutation service.
