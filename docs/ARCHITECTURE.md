@@ -107,3 +107,12 @@ The following flows remain part of the target architecture and are not implement
 3. Card and detail balances are calculated from non-deleted appointment shares less all payout records; no balance is stored.
 4. The payout action validates integer BDT with a minimum of ৳ 500, recalculates current balance inside a Prisma transaction, rejects amounts above it, and records the current admin as `paidById`.
 5. The detail page shows lifetime earnings, paid total, current balance, payout dates/amounts, and a 20-row paginated appointment history.
+
+## Implemented Phase 5 Flows
+
+### Patient Directory And Profile
+
+1. `/dashboard/patients` is available to authenticated staff and reads `q` and `page` from URL search parameters. The repository performs case-insensitive partial matches and returns 20 patients per page with non-deleted visit count and last visit.
+2. `/dashboard/patients/[id]` shows patient details, active visits with invoice links, unfinished session packages based on each package's latest active visit, and total fees from active visits.
+3. ADMIN can edit patient details; RECEPTIONIST sees the profile read-only.
+4. Patient deletion is hard delete only when no appointment row references the patient. The server action requires ADMIN and the service rechecks the constraint in a Prisma transaction, counting soft-deleted appointments too.
