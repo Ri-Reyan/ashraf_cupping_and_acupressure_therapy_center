@@ -7,6 +7,7 @@
 - `src/lib/` contains feature-agnostic auth guards, signed-session handling, Prisma access, Dhaka-time helpers, formatters, validators, and shared services.
 - `src/lib/validators/` contains per-feature Zod input contracts; common Bangladesh mobile and money primitives live in `shared.ts`.
 - `src/lib/services/balance.ts` calculates therapist earnings from active appointments and payout records; `balance-calculator.ts` contains the pure arithmetic.
+- `src/features/` contains per-feature actions, services, repositories, schemas, and UI components.
 - `src/prisma/` contains the generated Prisma 8 contract and database client; edit the source schema fragments, not generated files.
 - `prisma/schemas/` is the current contract source configured by `prisma.config.ts`.
 - `migrations/` contains Prisma 8 migration graph metadata and migration packages.
@@ -23,11 +24,11 @@
 
 ## Shared Logic
 
-- Feature forms and server actions import the specific schema from `src/lib/validators/`; mobile values normalize before the canonical BD number check.
+- Feature forms and server actions import feature schemas; shared mobile and money primitives live in `src/lib/validators/`.
 - Date filters use the Dhaka timezone helpers. Timestamp queries use half-open ranges; appointment serials use `getDhakaSerialDate()`.
 - Money presentation uses `formatBDT()`; validation and storage remain integer BDT.
 - `getTherapistBalance()` aggregates non-deleted appointment shares and all payout records. `calculateTherapistBalance()` contains the pure arithmetic and is tested without database access.
-- Run `npm test` for the Vitest suite covering mobile normalization, serial date boundaries, and lifetime balance arithmetic.
+- Run `npm test` for Vitest coverage of mobile normalization, Dhaka boundaries, appointment calculations, and lifetime balance arithmetic.
 
 ## Login And Role Check
 
@@ -50,24 +51,39 @@
 
 After the database schema is migrated, set `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, and normalized `SEED_ADMIN_MOBILE` in `.env`; `SEED_ADMIN_NAME` is optional and defaults to the email's local part. Run `npm run seed:admin`. The command stores only the Argon2 hash and skips creation whenever an ADMIN row already exists.
 
-## Planned Business Flows
+## Implemented Phase 2 Flows
 
-These flows are part of the target architecture but are not implemented in Phase 0.
+### Service Catalog
+
+1. `/dashboard/services` requires ADMIN and loads the Service catalog through its repository.
+2. Add, rename, and delete actions recheck ADMIN access, validate inputs, and delegate uniqueness/existence rules to the service layer.
+3. Appointment service names are stored as snapshots, so deleting a catalog entry does not rewrite historical appointment invoices.
 
 ### Create Appointment And Invoice
 
-1. Appointment form submits to the appointment Server Action.
-2. The action authenticates, authorizes, validates with Zod, and calls the appointment service.
-3. The service enforces patient upsert, active therapist, Dhaka serial, session, and therapist-share rules inside one transaction.
-4. The repository contains only the Prisma reads/writes used by the transaction.
-5. The committed appointment is read by invoice lookup and rendered by the PDF route.
+1. `/dashboard/appointments/new` authenticates staff and loads Service options plus ACTIVE therapists. The schema has no therapist `deletedAt` field, so ACTIVE status is the available eligibility filter.
+2. Mobile lookup normalizes Bangladesh prefixes, returns existing demographics, counts non-deleted visits, and lists incomplete packages.
+3. The form submits to the appointment Server Action, which authenticates, validates with Zod, and calls the appointment service with the current staff ID.
+4. One Prisma 8 `db.transaction` upserts patient details, catalogs typed services, verifies the therapist, applies package progression, calculates `Math.round(fee * therapistPercent / 100)`, allocates a Dhaka `PlainDate` serial, and inserts the appointment. Recognized PostgreSQL unique conflicts retry the whole transaction.
+5. The generated invoice number and appointment ID are returned. The authenticated PDF route reloads the persisted appointment and renders the English invoice with clinic environment details.
 
-### Therapist Payout
+## Implemented Phase 3 Flows
 
-1. The payout form calls the payout Server Action.
-2. The action requires ADMIN and validates an integer BDT amount.
-3. The payout service calculates earned lifetime share less prior payouts, enforces the minimum payout and available balance, then creates the payout with the current staff ID.
-4. The repository owns the payout and balance queries; balance is calculated, never stored.
+### Invoice PDF
+
+1. The download link calls `GET /api/invoices/[id]/pdf` in the Node.js runtime.
+2. The route requires ADMIN, validates the appointment UUID, and asks the invoice service for a non-deleted appointment plus its patient and therapist.
+3. `InvoicePdfDocument` renders the English invoice fields and clinic details from environment variables; the route returns it as a private, non-cacheable PDF attachment.
+
+### Invoice Search
+
+1. `/dashboard/invoices` is available to authenticated ADMIN and RECEPTIONIST users; `q` and `page` are read from Next.js `searchParams`.
+2. The invoice repository uses case-insensitive `ILIKE` partial matches against patient name and mobile, then filters out soft-deleted appointments.
+3. Results include patient and therapist names, are ordered newest first, and use 20-row offset pagination. The UI preserves search text in previous/next links and links each row to the ADMIN-only PDF route.
+
+## Planned Business Flows
+
+The following flows remain part of the target architecture and are not implemented yet.
 
 ### Today's Closing
 
@@ -81,3 +97,13 @@ These flows are part of the target architecture but are not implemented in Phase
 2. The dashboard service computes current and previous month boundaries in Asia/Dhaka.
 3. The repository aggregates non-deleted income, expenses, distinct patients, net, and cumulative daily income for both months.
 4. The feature component displays values, percentage changes, and the cumulative income chart.
+
+## Implemented Phase 4 Flows
+
+### Therapist Management And Payout
+
+1. `/dashboard/therapists` and `/dashboard/therapists/[id]` require ADMIN; the list defaults to ACTIVE therapists and has a separate BLOCKED view.
+2. Create/edit actions validate profile details; delete and restore actions recheck ADMIN and switch status between ACTIVE and BLOCKED. The current Therapist schema has no `deletedAt`, so BLOCKED is the agreed reversible deleted state.
+3. Card and detail balances are calculated from non-deleted appointment shares less all payout records; no balance is stored.
+4. The payout action validates integer BDT with a minimum of ৳ 500, recalculates current balance inside a Prisma transaction, rejects amounts above it, and records the current admin as `paidById`.
+5. The detail page shows lifetime earnings, paid total, current balance, payout dates/amounts, and a 20-row paginated appointment history.

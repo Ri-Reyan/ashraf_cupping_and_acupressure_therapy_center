@@ -54,7 +54,6 @@ export async function loginWithPassword(input: unknown) {
 
   if (
     !user ||
-    user.status === "BLOCKED" ||
     (user.role !== "ADMIN" && user.role !== "RECEPTIONIST") ||
     !user.passwordHash
   ) {

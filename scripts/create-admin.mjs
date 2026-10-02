@@ -1,7 +1,7 @@
 // Creates the initial admin account for database-backed login.
 // Run once from a trusted terminal after the schema migration is applied.
 import "dotenv/config";
-import { randomUUID } from "node:crypto";
+import "temporal-polyfill/full/global";
 import { stdout } from "node:process";
 import argon2 from "argon2";
 import postgres from "@prisma/orm-postgres/runtime";
@@ -41,7 +41,6 @@ async function main() {
     }
 
     const user = await db.orm.public.User.create({
-      id: randomUUID(),
       name: name || email.split("@")[0],
       email,
       passwordHash: await argon2.hash(password),

@@ -15,13 +15,13 @@ enum Status {
 }
 
 model User {
-  id           String            @id @db.Uuid
+  id           String            @id @default(uuid()) @db.Uuid
   name         String
   email        String            @unique
   passwordHash String?
   mobile       String
   role         Role
-  status       Status
+  status       Status            @default(ACTIVE)
   appointments Appointment[]
   expenses     Expense[]
   payouts      TherapistPayout[]

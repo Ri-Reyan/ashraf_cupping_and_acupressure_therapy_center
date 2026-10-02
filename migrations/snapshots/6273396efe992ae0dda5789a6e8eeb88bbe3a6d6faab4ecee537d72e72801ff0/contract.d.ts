@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'21454ac22634bf8a67fd73e6c27d99ed7ab1e5d503cb468b16459f0876123aff'>;
+  StorageHashBase<'6273396efe992ae0dda5789a6e8eeb88bbe3a6d6faab4ecee537d72e72801ff0'>;
 export type ExecutionHash =
-  ExecutionHashBase<'5c158311e39f0c4af68a7cd2e503af7e3d5b2f0ed5fc0cefc772f32a6e115c63'>;
+  ExecutionHashBase<'dff239d33a490bf02c66c6f1ae00d9adf253b48ccb47f472c8ec525952cee876'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -744,6 +744,10 @@ type ContractBase = Omit<
                   readonly nativeType: 'uuid';
                   readonly codecId: 'pg/uuid@1';
                   readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'function';
+                    readonly expression: 'gen_random_uuid()';
+                  };
                 };
                 readonly therapistId: {
                   readonly nativeType: 'uuid';
@@ -1299,10 +1303,6 @@ type ContractBase = Omit<
                   readonly nativeType: 'Status';
                   readonly codecId: 'pg/enum@1';
                   readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/enum@1', 'ACTIVE'>;
-                  };
                   readonly typeParams: { readonly typeName: 'Status' };
                 };
                 readonly updatedAt: {
@@ -2122,27 +2122,11 @@ type ContractBase = Omit<
           };
         },
         {
-          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
-          readonly ref: {
-            readonly entry: 'User';
-            readonly field: 'id';
-            readonly namespace: 'public';
-          };
-        },
-        {
           readonly onCreate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
           readonly onUpdate: { readonly id: 'plainDateTimeNow'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'User';
             readonly field: 'updatedAt';
-            readonly namespace: 'public';
-          };
-        },
-        {
-          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
-          readonly ref: {
-            readonly entry: 'advance';
-            readonly field: 'id';
             readonly namespace: 'public';
           };
         },

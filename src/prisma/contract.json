@@ -1625,6 +1625,10 @@
                 },
                 "status": {
                   "codecId": "pg/enum@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "ACTIVE"
+                  },
                   "nativeType": "Status",
                   "nullable": false,
                   "typeParams": {
@@ -1692,10 +1696,6 @@
                 },
                 "id": {
                   "codecId": "pg/uuid@1",
-                  "default": {
-                    "expression": "gen_random_uuid()",
-                    "kind": "function"
-                  },
                   "nativeType": "uuid",
                   "nullable": false
                 },
@@ -1950,10 +1950,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "6273396efe992ae0dda5789a6e8eeb88bbe3a6d6faab4ecee537d72e72801ff0"
+    "storageHash": "21454ac22634bf8a67fd73e6c27d99ed7ab1e5d503cb468b16459f0876123aff"
   },
   "execution": {
-    "executionHash": "dff239d33a490bf02c66c6f1ae00d9adf253b48ccb47f472c8ec525952cee876",
+    "executionHash": "5c158311e39f0c4af68a7cd2e503af7e3d5b2f0ed5fc0cefc772f32a6e115c63",
     "mutations": {
       "defaults": [
         {
@@ -2047,6 +2047,17 @@
         },
         {
           "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "User",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
             "id": "plainDateTimeNow",
             "kind": "generator"
           },
@@ -2057,6 +2068,17 @@
           "ref": {
             "entry": "User",
             "field": "updatedAt",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "advance",
+            "field": "id",
             "namespace": "public"
           }
         },
