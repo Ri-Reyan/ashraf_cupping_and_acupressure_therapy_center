@@ -12,6 +12,7 @@ import {
   Plus,
   ReceiptText,
   Users,
+  UserRoundPlus,
   Wallet,
 } from "lucide-react";
 import type { StaffRole } from "@/lib/auth";
@@ -58,6 +59,12 @@ const navigation = [
     label: "Services",
     href: "/dashboard/services",
     icon: List,
+    roles: ["ADMIN"],
+  },
+  {
+    label: "Staff",
+    href: "/dashboard/staff",
+    icon: UserRoundPlus,
     roles: ["ADMIN"],
   },
 ] as const;

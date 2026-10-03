@@ -126,3 +126,32 @@ export function insertAppointmentRecord(
 ) {
   return tx.orm.public.Appointment.create(appointment);
 }
+
+export function findAppointmentForMutation(
+  id: string,
+  tx: AppointmentTransaction,
+) {
+  return tx.orm.public.Appointment.where({ id }).first();
+}
+
+export function updateAppointmentRecord(
+  id: string,
+  input: {
+    therapistId: string;
+    services: string[];
+    fee: number;
+    therapistPercent: number;
+    therapistShare: number;
+  },
+  tx: AppointmentTransaction,
+) {
+  return tx.orm.public.Appointment.where({ id }).update(input);
+}
+
+export function softDeleteAppointmentRecord(
+  id: string,
+  deletedAt: Temporal.PlainDateTime,
+  tx: AppointmentTransaction,
+) {
+  return tx.orm.public.Appointment.where({ id }).update({ deletedAt });
+}

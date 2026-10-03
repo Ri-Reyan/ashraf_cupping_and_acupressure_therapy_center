@@ -28,14 +28,48 @@ export function DashboardAnalytics({ data }: { data: DashboardAnalyticsData }) {
       tone: data.net < 0 ? "text-[#a13f37]" : "text-[#116c61]",
     },
   ];
+  const comparisons = [
+    {
+      label: "Income",
+      current: data.comparison.income.current,
+      previous: data.comparison.income.previous,
+      change: data.comparison.income.changePercent,
+      increaseIsBad: false,
+      format: formatBDT,
+    },
+    {
+      label: "Expenses",
+      current: data.comparison.expenses.current,
+      previous: data.comparison.expenses.previous,
+      change: data.comparison.expenses.changePercent,
+      increaseIsBad: true,
+      format: formatBDT,
+    },
+    {
+      label: "Patients",
+      current: data.comparison.patients.current,
+      previous: data.comparison.patients.previous,
+      change: data.comparison.patients.changePercent,
+      increaseIsBad: false,
+      format: (value: number) => value.toLocaleString("en-BD"),
+    },
+    {
+      label: "Net",
+      current: data.comparison.net.current,
+      previous: data.comparison.net.previous,
+      change: data.comparison.net.changePercent,
+      increaseIsBad: false,
+      format: formatBDT,
+    },
+  ];
 
   return (
     <section>
       <header className="mb-6 border-b border-[#d9e7e3] pb-5">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#116c61]">
-          Clinic analytics
+          Admin analytics
         </p>
-        <h1 className="mt-2 text-2xl font-semibold">Dashboard</h1>
+        <h2 className="mt-2 text-xl font-semibold">Monthly overview</h2>
         <p className="mt-1 text-sm text-[#69807c]">{data.monthLabel}</p>
       </header>
 
@@ -55,7 +89,52 @@ export function DashboardAnalytics({ data }: { data: DashboardAnalyticsData }) {
         ))}
       </dl>
 
-      <AnalyticsCharts daily={data.daily} monthly={data.monthly} />
+      <section className="mb-8">
+        <div className="border-b border-[#d9e7e3] pb-3">
+          <h2 className="text-base font-semibold">Month comparison</h2>
+          <p className="mt-1 text-xs text-[#69807c]">
+            {data.monthLabel} vs {data.previousMonthLabel}
+          </p>
+        </div>
+        <div className="grid gap-x-6 sm:grid-cols-2 xl:grid-cols-4">
+          {comparisons.map((metric) => {
+            const isUp = metric.change !== null && metric.change > 0;
+            const isBad =
+              metric.change !== null && (metric.increaseIsBad ? isUp : !isUp);
+            return (
+              <div
+                key={metric.label}
+                className="border-b border-[#e2ebe8] py-4"
+              >
+                <p className="text-xs font-medium uppercase text-[#69807c]">
+                  {metric.label}
+                </p>
+                <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-sm">
+                  <span className="font-semibold">
+                    {metric.format(metric.current)}
+                  </span>
+                  <span className="text-[#69807c]">
+                    was {metric.format(metric.previous)}
+                  </span>
+                </div>
+                <p
+                  className={`mt-2 text-xs font-semibold ${metric.change === null ? "text-[#69807c]" : isBad ? "text-[#a13f37]" : "text-[#116c61]"}`}
+                >
+                  {metric.change === null
+                    ? "New"
+                    : `${isUp ? "Up" : "Down"} ${Math.abs(metric.change).toFixed(1)}%`}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <AnalyticsCharts
+        daily={data.daily}
+        monthly={data.monthly}
+        cumulativeIncome={data.cumulativeIncome}
+      />
 
       <section className="mt-8">
         <div className="flex flex-wrap items-end justify-between gap-3 border-b border-[#d9e7e3] pb-3">

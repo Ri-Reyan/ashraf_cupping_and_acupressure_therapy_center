@@ -2,14 +2,17 @@
 // Every create attempt runs through one Prisma 8 transaction.
 import "server-only";
 import { randomUUID } from "node:crypto";
+import { Temporal } from "temporal-polyfill";
 import { getDhakaToday } from "@/lib/dhaka-time";
 import { prisma } from "@/lib/prisma";
+import { getTherapistLedgerForAppointment } from "@/features/therapists/service";
 import type { AppointmentCreateInput } from "./schema";
 import {
   countPatientVisits,
   createPatientRecord,
   createServiceRecord,
   findActiveTherapist,
+  findAppointmentForMutation,
   findLatestPackageAppointment,
   findPatientByMobile,
   findPatientForCreate,
@@ -19,6 +22,8 @@ import {
   insertAppointmentRecord,
   listPatientSessions,
   updatePatientRecord,
+  softDeleteAppointmentRecord,
+  updateAppointmentRecord,
 } from "./repository";
 import {
   AppointmentRuleError,
@@ -197,4 +202,88 @@ export async function createAppointment(
   }
 
   throw new Error("Could not allocate an appointment serial. Please retry.");
+}
+
+export async function updateAppointment(input: {
+  id: string;
+  therapistId: string;
+  services: string[];
+  fee: number;
+  therapistPercent: number;
+}) {
+  return prisma.transaction(async (tx) => {
+    const existing = await findAppointmentForMutation(input.id, tx);
+    if (!existing || existing.deletedAt) {
+      throw new AppointmentRuleError("NOT_FOUND");
+    }
+
+    const therapist = await findActiveTherapist(input.therapistId, tx);
+    if (!therapist) throw new AppointmentRuleError("THERAPIST_UNAVAILABLE");
+
+    const services = [...new Set(input.services)];
+    for (const serviceName of services) {
+      if (!(await findServiceForCreate(serviceName, tx))) {
+        await createServiceRecord(serviceName, tx);
+      }
+    }
+
+    const newShare = calculateTherapistShare(input.fee, input.therapistPercent);
+    const oldLedger = await getTherapistLedgerForAppointment(
+      existing.therapistId,
+      tx,
+    );
+    if (existing.therapistId === input.therapistId) {
+      if (oldLedger.balance - existing.therapistShare + newShare < 0) {
+        throw new AppointmentRuleError("LEDGER_NEGATIVE");
+      }
+    } else {
+      const newLedger = await getTherapistLedgerForAppointment(
+        input.therapistId,
+        tx,
+      );
+      if (
+        oldLedger.balance - existing.therapistShare < 0 ||
+        newLedger.balance + newShare < 0
+      ) {
+        throw new AppointmentRuleError("LEDGER_NEGATIVE");
+      }
+    }
+
+    const updated = await updateAppointmentRecord(
+      input.id,
+      {
+        therapistId: therapist.id,
+        services,
+        fee: input.fee,
+        therapistPercent: input.therapistPercent,
+        therapistShare: newShare,
+      },
+      tx,
+    );
+    if (!updated) throw new AppointmentRuleError("NOT_FOUND");
+    return { id: updated.id };
+  });
+}
+
+export async function deleteAppointment(id: string) {
+  return prisma.transaction(async (tx) => {
+    const existing = await findAppointmentForMutation(id, tx);
+    if (!existing || existing.deletedAt) {
+      throw new AppointmentRuleError("NOT_FOUND");
+    }
+
+    const ledger = await getTherapistLedgerForAppointment(
+      existing.therapistId,
+      tx,
+    );
+    if (ledger.balance - existing.therapistShare < 0) {
+      throw new AppointmentRuleError("LEDGER_NEGATIVE");
+    }
+
+    await softDeleteAppointmentRecord(
+      id,
+      Temporal.Now.plainDateTimeISO("UTC"),
+      tx,
+    );
+  });
 }

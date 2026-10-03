@@ -13,6 +13,22 @@ export type DashboardAnalytics = {
   payouts: number;
   net: number;
   daily: { day: number; income: number; expenses: number }[];
+  cumulativeIncome: { day: number; current: number; previous: number }[];
+  previousMonthLabel: string;
+  comparison: {
+    income: { current: number; previous: number; changePercent: number | null };
+    expenses: {
+      current: number;
+      previous: number;
+      changePercent: number | null;
+    };
+    patients: {
+      current: number;
+      previous: number;
+      changePercent: number | null;
+    };
+    net: { current: number; previous: number; changePercent: number | null };
+  };
   monthly: {
     month: string;
     income: number;
@@ -20,6 +36,30 @@ export type DashboardAnalytics = {
     payouts: number;
   }[];
   topTherapists: { id: string; name: string; fee: number }[];
+};
+
+export type TodayDashboardSummary = {
+  date: string;
+  appointments: {
+    id: string;
+    serial: number;
+    patient: string;
+    therapist: string;
+    service: string;
+    fee: number;
+    createdBy: string;
+  }[];
+  income: number;
+  expenseRows: {
+    id: string;
+    name: string;
+    amount: number;
+    createdBy: string;
+  }[];
+  expenses: number;
+  payoutRows: { id: string; therapist: string; amount: number }[];
+  payouts: number;
+  closing: number;
 };
 
 function dhakaMidnight(date: Temporal.PlainDate) {
@@ -42,6 +82,12 @@ function addToMap(
   map.set(key, (map.get(key) ?? 0) + (amount ?? 0));
 }
 
+function changePercent(current: number, previous: number) {
+  return previous === 0
+    ? null
+    : Math.round(((current - previous) / previous) * 1000) / 10;
+}
+
 function monthLabel(month: string) {
   const date = Temporal.PlainDate.from(`${month}-01`);
   return `${date.toLocaleString("en-BD", { month: "short" })} '${month.slice(2, 4)}`;
@@ -51,6 +97,7 @@ export async function getDashboardAnalytics(): Promise<DashboardAnalytics> {
   const today = getDhakaToday();
   const currentMonthStart = today.with({ day: 1 });
   const nextMonthStart = currentMonthStart.add({ months: 1 });
+  const previousMonthStart = currentMonthStart.subtract({ months: 1 });
   const historyStart = currentMonthStart.subtract({ months: 5 });
   const monthKeys: string[] = [];
 
@@ -85,6 +132,14 @@ export async function getDashboardAnalytics(): Promise<DashboardAnalytics> {
     .groupBy("patientId")
     .aggregate((aggregate) => ({ visits: aggregate.count() }));
 
+  const previousPatients = await prisma.orm.public.Appointment.where(
+    (appointment) => appointment.serialDate.gte(previousMonthStart),
+  )
+    .where((appointment) => appointment.serialDate.lt(currentMonthStart))
+    .where((appointment) => appointment.deletedAt.isNull())
+    .groupBy("patientId")
+    .aggregate((aggregate) => ({ visits: aggregate.count() }));
+
   const therapistFees = await prisma.orm.public.Appointment.where(
     (appointment) => appointment.serialDate.gte(currentMonthStart),
   )
@@ -107,7 +162,6 @@ export async function getDashboardAnalytics(): Promise<DashboardAnalytics> {
     }),
   );
 
-  const currentPayoutTotal = payoutTotals.at(-1)?.[1] ?? 0;
   const monthPayoutMap = new Map(payoutTotals);
   const incomeByDay = new Map<string, number>();
   const expensesByDay = new Map<string, number>();
@@ -139,6 +193,48 @@ export async function getDashboardAnalytics(): Promise<DashboardAnalytics> {
     });
   }
 
+  const currentMonthIncome =
+    incomeByMonth.get(currentMonthStart.toString().slice(0, 7)) ?? 0;
+  const previousMonthIncome =
+    incomeByMonth.get(previousMonthStart.toString().slice(0, 7)) ?? 0;
+  const currentMonthExpenses =
+    expensesByMonth.get(currentMonthStart.toString().slice(0, 7)) ?? 0;
+  const previousMonthExpenses =
+    expensesByMonth.get(previousMonthStart.toString().slice(0, 7)) ?? 0;
+  const currentMonthPayouts =
+    monthPayoutMap.get(currentMonthStart.toString().slice(0, 7)) ?? 0;
+  const previousMonthPayouts =
+    monthPayoutMap.get(previousMonthStart.toString().slice(0, 7)) ?? 0;
+  const currentMonthPatients = currentPatients.length;
+  const previousMonthPatientCount = previousPatients.length;
+  const currentMonthNet =
+    currentMonthIncome - currentMonthExpenses - currentMonthPayouts;
+  const previousMonthNet =
+    previousMonthIncome - previousMonthExpenses - previousMonthPayouts;
+
+  const cumulativeIncome = [];
+  let currentCumulative = 0;
+  let previousCumulative = 0;
+  const comparisonDays = Math.max(
+    currentMonthStart.daysInMonth,
+    previousMonthStart.daysInMonth,
+  );
+  for (let day = 1; day <= comparisonDays; day += 1) {
+    if (day <= currentMonthStart.daysInMonth) {
+      currentCumulative +=
+        incomeByDay.get(currentMonthStart.with({ day }).toString()) ?? 0;
+    }
+    if (day <= previousMonthStart.daysInMonth) {
+      previousCumulative +=
+        incomeByDay.get(previousMonthStart.with({ day }).toString()) ?? 0;
+    }
+    cumulativeIncome.push({
+      day,
+      current: currentCumulative,
+      previous: previousCumulative,
+    });
+  }
+
   const monthly = monthKeys.map((month) => ({
     month: monthLabel(month),
     income: incomeByMonth.get(month) ?? 0,
@@ -166,23 +262,137 @@ export async function getDashboardAnalytics(): Promise<DashboardAnalytics> {
     fee: therapist.fee,
   }));
 
-  const income =
-    incomeByMonth.get(currentMonthStart.toString().slice(0, 7)) ?? 0;
-  const expenses =
-    expensesByMonth.get(currentMonthStart.toString().slice(0, 7)) ?? 0;
-
   return {
     monthLabel: currentMonthStart.toLocaleString("en-BD", {
       month: "long",
       year: "numeric",
     }),
-    patientCount: currentPatients.length,
-    income,
-    expenses,
-    payouts: currentPayoutTotal,
-    net: income - expenses - currentPayoutTotal,
+    patientCount: currentMonthPatients,
+    income: currentMonthIncome,
+    expenses: currentMonthExpenses,
+    payouts: currentMonthPayouts,
+    net: currentMonthNet,
     daily,
+    cumulativeIncome,
+    previousMonthLabel: monthLabel(previousMonthStart.toString().slice(0, 7)),
+    comparison: {
+      income: {
+        current: currentMonthIncome,
+        previous: previousMonthIncome,
+        changePercent: changePercent(currentMonthIncome, previousMonthIncome),
+      },
+      expenses: {
+        current: currentMonthExpenses,
+        previous: previousMonthExpenses,
+        changePercent: changePercent(
+          currentMonthExpenses,
+          previousMonthExpenses,
+        ),
+      },
+      patients: {
+        current: currentMonthPatients,
+        previous: previousMonthPatientCount,
+        changePercent: changePercent(
+          currentMonthPatients,
+          previousMonthPatientCount,
+        ),
+      },
+      net: {
+        current: currentMonthNet,
+        previous: previousMonthNet,
+        changePercent: changePercent(currentMonthNet, previousMonthNet),
+      },
+    },
     monthly,
     topTherapists: topTherapistRows,
+  };
+}
+
+export async function getTodayDashboardSummary(): Promise<TodayDashboardSummary> {
+  const today = getDhakaToday();
+  const tomorrow = today.add({ days: 1 });
+  const expenseStart = dhakaMidnight(today);
+  const expenseEnd = dhakaMidnight(tomorrow);
+  const payoutStart = payoutTimestampBoundary(today);
+  const payoutEnd = payoutTimestampBoundary(tomorrow);
+
+  const [
+    appointments,
+    incomeResult,
+    expenses,
+    expenseResult,
+    payouts,
+    payoutResult,
+  ] = await Promise.all([
+    prisma.orm.public.Appointment.where((appointment) =>
+      appointment.serialDate.eq(today),
+    )
+      .where((appointment) => appointment.deletedAt.isNull())
+      .include("patient", (patient) => patient.select("name"))
+      .include("therapist", (therapist) => therapist.select("name"))
+      .include("createdBy", (user) => user.select("name"))
+      .orderBy((appointment) => appointment.serial.asc())
+      .all(),
+    prisma.orm.public.Appointment.where((appointment) =>
+      appointment.serialDate.eq(today),
+    )
+      .where((appointment) => appointment.deletedAt.isNull())
+      .aggregate((aggregate) => ({ total: aggregate.sum("fee") })),
+    prisma.orm.public.Expense.where((expense) =>
+      expense.expenseDate.gte(expenseStart),
+    )
+      .where((expense) => expense.expenseDate.lt(expenseEnd))
+      .include("createdBy", (user) => user.select("name"))
+      .orderBy((expense) => expense.expenseDate.desc())
+      .all(),
+    prisma.orm.public.Expense.where((expense) =>
+      expense.expenseDate.gte(expenseStart),
+    )
+      .where((expense) => expense.expenseDate.lt(expenseEnd))
+      .aggregate((aggregate) => ({ total: aggregate.sum("amount") })),
+    prisma.orm.public.TherapistPayout.where((payout) =>
+      payout.createdAt.gte(payoutStart),
+    )
+      .where((payout) => payout.createdAt.lt(payoutEnd))
+      .include("therapist", (therapist) => therapist.select("name"))
+      .orderBy((payout) => payout.createdAt.desc())
+      .all(),
+    prisma.orm.public.TherapistPayout.where((payout) =>
+      payout.createdAt.gte(payoutStart),
+    )
+      .where((payout) => payout.createdAt.lt(payoutEnd))
+      .aggregate((aggregate) => ({ total: aggregate.sum("amount") })),
+  ]);
+
+  const income = incomeResult.total ?? 0;
+  const expensesTotal = expenseResult.total ?? 0;
+  const payoutsTotal = payoutResult.total ?? 0;
+
+  return {
+    date: today.toString(),
+    appointments: appointments.map((appointment) => ({
+      id: appointment.id,
+      serial: appointment.serial,
+      patient: appointment.patient?.name ?? "Unavailable",
+      therapist: appointment.therapist?.name ?? "Unavailable",
+      service: (appointment.services ?? []).join(", "),
+      fee: appointment.fee,
+      createdBy: appointment.createdBy?.name ?? "Unavailable",
+    })),
+    income,
+    expenseRows: expenses.map((expense) => ({
+      id: expense.id,
+      name: expense.name,
+      amount: expense.amount,
+      createdBy: expense.createdBy?.name ?? "Unavailable",
+    })),
+    expenses: expensesTotal,
+    payoutRows: payouts.map((payout) => ({
+      id: payout.id,
+      therapist: payout.therapist?.name ?? "Unavailable",
+      amount: payout.amount,
+    })),
+    payouts: payoutsTotal,
+    closing: income - expensesTotal - payoutsTotal,
   };
 }

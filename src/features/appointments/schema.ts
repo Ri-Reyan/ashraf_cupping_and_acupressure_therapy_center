@@ -58,3 +58,13 @@ export const appointmentCreateSchema = z
   });
 
 export type AppointmentCreateInput = z.infer<typeof appointmentCreateSchema>;
+
+export const appointmentUpdateSchema = z.object({
+  id: z.uuid(),
+  therapistId: z.uuid(),
+  services: z.array(z.string().trim().min(1).max(120)).min(1).max(20),
+  fee: positiveMoneySchema,
+  therapistPercent: z.number().int().min(0).max(100),
+});
+
+export type AppointmentUpdateInput = z.infer<typeof appointmentUpdateSchema>;

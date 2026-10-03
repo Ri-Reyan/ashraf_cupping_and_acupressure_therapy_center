@@ -3,7 +3,11 @@
 export class AppointmentRuleError extends Error {
   constructor(
     readonly code:
-      "PACKAGE_UNAVAILABLE" | "PACKAGE_COMPLETE" | "THERAPIST_UNAVAILABLE",
+      | "PACKAGE_UNAVAILABLE"
+      | "PACKAGE_COMPLETE"
+      | "THERAPIST_UNAVAILABLE"
+      | "NOT_FOUND"
+      | "LEDGER_NEGATIVE",
   ) {
     super(code);
   }

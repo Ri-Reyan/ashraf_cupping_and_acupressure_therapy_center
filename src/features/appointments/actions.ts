@@ -7,8 +7,14 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { bdMobileSchema } from "@/lib/validators/shared";
 import { AppointmentRuleError } from "./rules";
-import { appointmentCreateSchema } from "./schema";
-import { createAppointment, getPatientVisitInfo } from "./service";
+import { appointmentCreateSchema, appointmentUpdateSchema } from "./schema";
+import {
+  createAppointment,
+  deleteAppointment,
+  getPatientVisitInfo,
+  updateAppointment,
+} from "./service";
+import { requireRole } from "@/lib/auth";
 
 const lookupSchema = z.object({ mobile: bdMobileSchema });
 
@@ -45,6 +51,9 @@ export async function createAppointmentAction(input: unknown) {
         PACKAGE_UNAVAILABLE: "That session package is no longer available.",
         PACKAGE_COMPLETE: "That session package is already complete.",
         THERAPIST_UNAVAILABLE: "Choose an active therapist.",
+        NOT_FOUND: "Appointment not found.",
+        LEDGER_NEGATIVE:
+          "This change would make a therapist's balance negative.",
       };
       return { ok: false as const, error: messages[error.code] };
     }
@@ -53,5 +62,63 @@ export async function createAppointmentAction(input: unknown) {
       ok: false as const,
       error: "Could not create the appointment. Please try again.",
     };
+  }
+}
+
+export async function updateAppointmentAction(input: unknown) {
+  await requireRole("ADMIN");
+  const parsed = appointmentUpdateSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false as const, error: "Check the appointment details." };
+  }
+
+  try {
+    await updateAppointment(parsed.data);
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/invoices");
+    revalidatePath("/dashboard/therapists");
+    revalidatePath("/dashboard/patients");
+    return { ok: true as const, data: null };
+  } catch (error) {
+    if (error instanceof AppointmentRuleError) {
+      const messages = {
+        PACKAGE_UNAVAILABLE: "That session package is no longer available.",
+        PACKAGE_COMPLETE: "That session package is already complete.",
+        THERAPIST_UNAVAILABLE: "Choose an active therapist.",
+        NOT_FOUND: "Appointment not found.",
+        LEDGER_NEGATIVE:
+          "This change would make a therapist's balance negative.",
+      };
+      return { ok: false as const, error: messages[error.code] };
+    }
+    console.error("Appointment update failed.");
+    return { ok: false as const, error: "Could not update the appointment." };
+  }
+}
+
+export async function deleteAppointmentAction(input: unknown) {
+  await requireRole("ADMIN");
+  const parsed = z.object({ id: z.uuid() }).safeParse(input);
+  if (!parsed.success) {
+    return { ok: false as const, error: "Select a valid appointment." };
+  }
+
+  try {
+    await deleteAppointment(parsed.data.id);
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/invoices");
+    revalidatePath("/dashboard/therapists");
+    revalidatePath("/dashboard/patients");
+    return { ok: true as const, data: null };
+  } catch (error) {
+    if (error instanceof AppointmentRuleError) {
+      const message =
+        error.code === "LEDGER_NEGATIVE"
+          ? "Deleting this appointment would make a therapist's balance negative."
+          : "Appointment not found.";
+      return { ok: false as const, error: message };
+    }
+    console.error("Appointment deletion failed.");
+    return { ok: false as const, error: "Could not delete the appointment." };
   }
 }

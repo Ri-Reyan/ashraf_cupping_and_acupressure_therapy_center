@@ -19,6 +19,7 @@ import type { DashboardAnalytics } from "@/lib/services/analytics";
 
 const chartColors = {
   income: "#116c61",
+  previous: "#5279a5",
   expenses: "#b34d42",
   payouts: "#bd8124",
 };
@@ -33,7 +34,8 @@ function moneyTick(value: number) {
 export function AnalyticsCharts({
   daily,
   monthly,
-}: Pick<DashboardAnalytics, "daily" | "monthly">) {
+  cumulativeIncome,
+}: Pick<DashboardAnalytics, "daily" | "monthly" | "cumulativeIncome">) {
   return (
     <div className="grid gap-6 xl:grid-cols-2">
       <section className="border border-[#d9e7e3] bg-white p-4 sm:p-5">
@@ -84,6 +86,62 @@ export function AnalyticsCharts({
                 maxBarSize={18}
               />
             </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+
+      <section className="border border-[#d9e7e3] bg-white p-4 sm:p-5">
+        <div className="mb-4">
+          <h2 className="text-base font-semibold">Cumulative income</h2>
+          <p className="mt-1 text-xs text-[#69807c]">
+            Current month compared with last month by day-of-month · BDT
+          </p>
+        </div>
+        <div
+          className="h-72 w-full"
+          role="img"
+          aria-label="Cumulative income this month compared with last month"
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={cumulativeIncome}
+              margin={{ top: 8, right: 8, left: 0, bottom: 4 }}
+            >
+              <CartesianGrid stroke="#e2ebe8" vertical={false} />
+              <XAxis
+                dataKey="day"
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: "#526965", fontSize: 11 }}
+              />
+              <YAxis
+                tickFormatter={moneyTick}
+                tickLine={false}
+                axisLine={false}
+                width={58}
+                tick={{ fill: "#526965", fontSize: 10 }}
+              />
+              <Tooltip formatter={(value) => formatBDT(Number(value))} />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="current"
+                name="This month"
+                stroke={chartColors.income}
+                strokeWidth={2.5}
+                dot={{ r: 3 }}
+                activeDot={{ r: 5 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="previous"
+                name="Last month"
+                stroke={chartColors.previous}
+                strokeWidth={2.5}
+                dot={{ r: 3 }}
+                activeDot={{ r: 5 }}
+              />
+            </LineChart>
           </ResponsiveContainer>
         </div>
       </section>

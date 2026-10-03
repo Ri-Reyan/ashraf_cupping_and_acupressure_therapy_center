@@ -14,6 +14,7 @@ import {
   listPayoutRecords,
   listTherapistAppointmentRecords,
   listTherapistRecords,
+  type TherapistTransaction,
   updateTherapistRecord,
   updateTherapistStatus,
 } from "./repository";
@@ -80,6 +81,15 @@ export async function payoutTherapist(
       balance: balance - payout.amount,
     };
   });
+}
+
+/** Calculates the ledger available to appointment mutations within their transaction. */
+export async function getTherapistLedgerForAppointment(
+  therapistId: string,
+  tx: TherapistTransaction,
+) {
+  const totals = await getBalanceAggregates(therapistId, tx);
+  return calculateTherapistBalance(totals.lifetime, totals.paid);
 }
 
 export async function getTherapistDetail(id: string, requestedPage: number) {
