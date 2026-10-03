@@ -82,7 +82,9 @@ export function DashboardSidebar({
   );
 
   return (
-    <aside className="flex min-h-16 shrink-0 flex-row items-center justify-between bg-[#123f39] px-2 text-white md:min-h-screen md:w-60 md:flex-col md:items-stretch md:px-3">
+    <aside
+      className={`flex h-1/5 z-50 shrink-0 overflow-hidden flex-row items-center justify-between bg-[#123f39] px-2 text-white md:min-h-screen md:w-60 md:flex-col md:items-stretch md:px-3`}
+    >
       <Link
         href="/dashboard"
         className="flex h-16 items-center gap-3 px-2 md:border-b md:border-white/15"
@@ -100,7 +102,7 @@ export function DashboardSidebar({
 
       <nav
         aria-label="Dashboard"
-        className="flex items-center gap-1 md:block md:flex-1 md:space-y-1 md:py-5"
+        className="flex flex-row items-center gap-1 md:block md:flex-1 md:space-y-1 md:py-5"
       >
         {items.map(({ label, href, icon: Icon }) => {
           const active =
@@ -113,7 +115,7 @@ export function DashboardSidebar({
               href={href}
               aria-current={active ? "page" : undefined}
               title={label}
-              className={`flex size-10 items-center justify-center gap-3 text-sm transition-colors md:h-10 md:w-full md:justify-start md:px-3 ${active ? "bg-white text-[#123f39]" : "text-white/75 hover:bg-white/10 hover:text-white"}`}
+              className={`flex size-7 items-center justify-center gap-3 text-sm transition-colors md:h-10 md:w-full md:justify-start md:px-3 ${active ? "bg-white text-[#123f39]" : "text-white/75 hover:bg-white/10 hover:text-white"}`}
             >
               <Icon aria-hidden="true" className="size-4.5 shrink-0" />
               <span className="hidden md:inline">{label}</span>

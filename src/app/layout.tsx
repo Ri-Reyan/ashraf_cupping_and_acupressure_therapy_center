@@ -4,8 +4,7 @@ import "./globals.css";
 import { LandingProvider } from "@/context/LandingContext";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 // ফন্ট কনফিগারেশন
 const hindSiliguri = Hind_Siliguri({
@@ -40,7 +39,12 @@ export default function RootLayout({
   return (
     <html
       lang="bn"
-      className={cn(hindSiliguri.variable, notoSerif.variable, "font-sans", geist.variable)}
+      className={cn(
+        hindSiliguri.variable,
+        notoSerif.variable,
+        "font-sans",
+        geist.variable,
+      )}
     >
       <body className="font-serif antialiased bg-[#F8FBFA] text-[#173F3A]">
         <LandingProvider>{children}</LandingProvider>
